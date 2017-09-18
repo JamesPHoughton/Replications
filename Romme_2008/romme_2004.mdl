@@ -1,0 +1,420 @@
+{UTF-8}
+Actual Decision Rate 1=
+	Adapted Normal Decision Rate * Issues Discussed First Time / (Issues Discussed First Time\
+		 + Issues Discussed Second Time)
+	~	Issues/Meeting [0,?]
+	~	The rate at which the system succeeds in taking unanimous decisions on issues \
+		discussed for the first time.
+		We assume the system distributes its attention in any meeting between \
+		issues discussed for the first and those discussed for the second time – \
+		this distribution is assumed to be proportional (Issues Discussed First \
+		Time divided by the total number of issues discussed)
+	|
+
+Decision Failure Rate=
+	Issues Discussed Second Time - Actual Decision Rate 2
+	~	Issues/Meeting [0,?]
+	~	The rate at which the system fails to take unanimous decisions (after these issues \
+		have been discussed in two subsequent meetings).
+		This is the number of issues discussed for the second time in the current \
+		meeting, minus those issues on which decisions are made.
+	|
+
+Actual Decision Rate 2=
+	Adapted Normal Decision Rate * Issues Discussed Second Time/(Issues Discussed First Time\
+		 + Issues Discussed Second Time)
+	~	Issues/Meeting [0,?]
+	~	The rate at which the system succeeds in taking unanimous decisions on issues \
+		discussed for the second time.
+		The system distributes its attention in each meeting between issues \
+		discussed for the first and for the second time – this distribution is \
+		assumed to be proportional (Issues Discussed Second Time divided by the \
+		total number of issues discussed).
+	|
+
+Adapted Normal Decision Rate=
+	Normal Decision Rate * Effect on Shared Effort * Effect on Time and Resources to Build Unanimity
+	~	Issues/Meeting [0,?]
+	~	The cumulative effect of decision pressure on shared effort and the time & \
+		resources to build unanimity on the normal decision capacity.
+	|
+
+Agenda Cap=
+	6
+	~	Issues/Meeting [0,?]
+	~	The agenda capacity for one meeting, that is, the total number of issues \
+		that can be discussed in a single meeting.
+	|
+
+Agenda Placement Rate=
+	MIN(Cap Issues First Time, Issues to be Decided)
+	~	Issues/Meeting [0,?]
+	~	The rate at which ’first time’ issues enter the agenda of the upcoming \
+		meeting. ‘First time’ is in apostrophes in this definition because the \
+		Issues To Be Decided may include ‘old’ issues being recycled (see \
+		figure).
+	|
+
+Cap Issues First Time=
+	Agenda Cap - Extended Discussion Rate
+	~	 [0,?]
+	~	The agenda capacity of the upcoming meeting for issues discussed for the first time. 
+		This capacity is determined by the capacity of the whole meeting minus \
+		issues that (were not decided upon in the previous meeting and) will be \
+		discussed for the second time in the upcoming meeting.
+	|
+
+Decision Performance=
+	(Actual Decision Rate 1 + Actual Decision Rate 2) / DELAY1(New Issue Inflow Rate, 1 \
+		)
+	~	Dmnl [0,?]
+	~	The overall decision performance of the system, determined as a straightforward \
+		output/input ratio: the sum of the two actual decision rates divided by \
+		the new issue inflow rate.
+		Because it takes at least one meeting to take a decision, the latter \
+		variable is delayed for 1 meeting (t-1).
+	|
+
+Decision Pressure=
+	Desired Decision Rate/Normal Decision Rate
+	~	Dmnl [0,?]
+	~	Decision Pressure is equal to the ratio of the desired and normal decision \
+		rates. The higher the desired decision rate relative to how the system \
+		normally performs, the higher the pressure on the participants in the \
+		decision-making process.
+	|
+
+Decision Skills=
+	1
+	~	Dmnl
+	~	The level of the decision skills of the participants in the system.
+		This variable is standardized at 1.
+	|
+
+Desired Decision Rate=
+	SMOOTH(Indicated Decision Rate, Time to Adapt Des Rate )
+	~	 [0,?]
+	~	The system's perception of how fast it needs to decide on issues. 
+		The Desired Decision Rate is equal to a first order exponential smooth of \
+		the indicated rate (SMOOTH1).
+	|
+
+Desired Time per Issue=
+	1
+	~	 [0,?]
+	~	This is the intended decision time: the time interval, in terms of number \
+		of meetings, in which
+	|
+
+Effect on Shared Effort=
+	Table for Effect on Shared Effort(Decision Pressure)
+	~	Dmnl
+	~		|
+
+Effect on Time and Resources to Build Unanimity=
+	Table for Effect on Time and Resources to Build Unanimity(Decision Pressure)
+	~	Dmnl
+	~		|
+
+Extended Discussion Rate=
+	Issues Discussed First Time - Actual Decision Rate 1
+	~	Issues/Meeting [0,?]
+	~	The rate at which the system moves decisions discussed for the first time to the \
+		next meeting because they require extended discussion.
+		This rate involves all Issues Discussed First Time minus those issues on \
+		which decisions were taken in the same meeting.
+	|
+
+Group Size=
+	10
+	~	Persons [0,?]
+	~	This is the total number of people participating in meetings and decisions taken in \
+		these meetings.
+		In the initial situation, the group size is set at 10 persons. In the \
+		comparative analysis for different group sizes, the value of Group Size \
+		varies.
+	|
+
+Indicated Decision Rate=
+	Issues to be Decided/Desired Time per Issue
+	~	Issues/Meeting [0,?]
+	~	The system's required decision speed, as it directly follows from the \
+		number of Issues To Be Decided divided by the number of meetings to be \
+		spent on one issue.
+	|
+
+Issue Recycling Rate=
+	DELAY1(Issues Undecided , Recycle Delay )
+	~	Issues/Meeting [0,?]
+	~	The rate at which the system recycles issues on which it has failed to make \
+		unanimous decisions earlier.
+		This rate is determined by the stock of Issues Undecided and the \
+		RecycleDelay; that is, the DELAY function returns the value of Issues \
+		Undecided after the given time delay.
+	|
+
+Issues Discussed First Time= INTEG (
+	Agenda Placement Rate-Actual Decision Rate 1-Extended Discussion Rate,
+		4)
+	~	Issues [0,?]
+	~	This is the stock of issues being discussed in the current meeting for the \
+		first time; this stock is the result of the initial value of the stock \
+		plus the inflow minus the outflows.
+	|
+
+Issues Discussed Second Time= INTEG (
+	Extended Discussion Rate-Actual Decision Rate 2-Decision Failure Rate,
+		0)
+	~	 [0,?]
+	~	The stock of issues being discussed for the second time (in the current \
+		meeting); this stock is the result of the initial stock plus the inflow \
+		minus outflows.
+	|
+
+Issues to be Decided= INTEG (
+	Issue Recycling Rate+New Issue Inflow Rate-Agenda Placement Rate,
+		4)
+	~	Issues [0,?]
+	~	This is the current stock of issues to be decided; this stock is the result of the \
+		initial stock
+		plus the accumulation of all inflows minus outflows since t = 0 (the first \
+		meeting).
+	|
+
+Issues Undecided= INTEG (
+	Decision Failure Rate-Issue Recycling Rate,
+		0)
+	~	Issues [0,?]
+	~	The stock of issues that are undecided after being discussed in two \
+		subsequent meetings
+	|
+
+New Issue Inflow Rate=
+	4
+	~	Issues/Meeting [0,?]
+	~	The rate at which new issues arrive, that is, are added to the stock of \
+		issues to be processed and decided; this is an exogenous variable in this \
+		model.
+	|
+
+Normal Decision Rate=
+	Decision Skills * SQRT(160/Group Size)
+	~	Issues/Meeting [0,?]
+	~	This is the system’s normal decision rate, determined by the level of decision \
+		skills times an exponentially decreasing function of group size.
+		The specification of the latter function as the square root of constant/GroupSize is \
+		inspired by Einstein’s E=mc2 or c=SQRT(E/m).
+		The value of the constant is set at 160 in this study; if Decision Skills \
+		= 1, this gives a Normal Decision Rate = 4 for Group Size = 10, etcetera.
+	|
+
+Recycle Delay=
+	Table for Recycle Delay(Decision Pressure)
+	~	 [0,?]
+	~		|
+
+Table for Effect on Shared Effort(
+	[(0,0)-(10,10)],(0,0.8),(0.25,0.8),(0.75,0.9),(1,1),(1.25,1.25),(1.5,1.6),(1.75,1.8)\
+		,(2,1.9),(3,1.9))
+	~	Dmnl
+	~	This graph depicts the positive effects of decision pressure on the shared effort \
+		made. Very low decision pressure tends to reduce the effort made; this \
+		effect is limited however. A medium or ‘normal’ amount of decision \
+		pressure (around 1) does not substantially influence the shared effort; \
+		higher amounts of pressure have a increasingly strong effects on the \
+		effort made, but at a certain point more pressure has no further effect on \
+		performance.
+		This graphical function is standardized at (1.00, 1.00) – if the input value is 1, \
+		then the output is also 1.
+		If DecisionPressure > 3, the effect is 1.90
+	|
+
+Table for Effect on Time and Resources to Build Unanimity(
+	[(0,0)-(10,10)],(0,1),(1.25,1),(1.5,0.98),(1.75,0.9),(2,0.75),(2.25,0.45),(2.5,0.25)\
+		,(2.75,0.17),(3,0.14),(3.25,0.12),(3.5,0.11),(3.75,0.1),(4,0.1))
+	~	Dmnl
+	~	This graph depicts the negative effect of an increasing amount of Decision Pressure \
+		on the ability to take decisions unanimously. The premise here is that \
+		after a certain critical point, the system is overwhelmed by the amount of \
+		pressure (because time and resources to develop unanimity – per issue \
+		processed – are increasingly scarce) and is less able to deal with \
+		individual participants or subgroups blocking proposed decisions.
+		This graphical function is standardized at (1.00, 1.00) – if input is 1, then the \
+		output is also 1.
+		If Decision Pressure > 4, the resulting effect is 0.1
+	|
+
+Table for Recycle Delay(
+	[(0,0)-(10,10)],(0,0),(1,0),(1.5,1),(2,1),(2.5,2),(3,2))
+	~	Dmnl
+	~	This graphical function defines the effects of decision pressure on the delay to \
+		recycle issues that have not been decided yet.
+		We assume that when decision pressure is lower than or equal to 1, the delay is 0. \
+		With pressure increasing, the delay increases to 1 meeting and \
+		subsequently 2 meetings. Thus, the graph is discontinuous in nature \
+		(because a delay of for example 1.6 meeting does not make sense).
+		If DecisionPressure > 3, the output value is 2. In this respect, we assume \
+		that decisions on policy issues can be somewhat delayed, but not for a \
+		longer period (even when decision pressure is very high).
+	|
+
+Time to Adapt Des Rate=
+	2
+	~	Meetings [0,?]
+	~	The time (in meetings) required for the system to recognize that a new \
+		desired decision rate is needed.
+	|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 25
+	~	Meetings
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	Meetings
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP 
+	~	Meetings [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 1
+	~	Meetings [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|72,72,100,0
+10,1,Issues to be Decided,255,189,40,20,3,3,0,0,0,0,0,0
+10,2,Issues Discussed First Time,507,187,40,20,3,3,0,0,0,0,0,0
+10,3,Issues Discussed Second Time,727,189,40,20,3,3,0,0,0,0,0,0
+10,4,Issues Undecided,380,48,40,20,3,3,0,0,0,0,0,0
+1,5,7,2,4,0,0,22,0,0,0,-1--1--1,,1|(425,188)|
+1,6,7,1,100,0,0,22,0,0,0,-1--1--1,,1|(333,188)|
+11,7,668,377,188,6,8,34,3,0,0,1,0,0,0
+10,8,Agenda Placement Rate,377,204,60,8,40,3,0,0,-1,0,0,0
+12,9,48,517,309,10,8,0,3,0,0,-1,0,0,0
+1,10,12,9,4,0,0,22,0,0,0,-1--1--1,,1|(517,286)|
+1,11,12,2,100,0,0,22,0,0,0,-1--1--1,,1|(517,233)|
+11,12,48,517,265,8,6,33,3,0,0,4,0,0,0
+10,13,Actual Decision Rate 1,583,265,58,8,40,3,0,0,-1,0,0,0
+12,14,48,94,188,10,8,0,3,0,0,-1,0,0,0
+1,15,17,1,4,0,0,22,0,0,0,-1--1--1,,1|(187,187)|
+1,16,17,14,100,0,0,22,0,0,0,-1--1--1,,1|(125,187)|
+11,17,48,153,187,6,8,34,3,0,0,1,0,0,0
+10,18,New Issue Inflow Rate,153,203,57,8,40,3,0,0,-1,0,0,0
+1,19,21,3,4,0,0,22,0,0,0,-1--1--1,,1|(656,189)|
+1,20,21,2,100,0,0,22,0,0,0,-1--1--1,,1|(580,189)|
+11,21,444,620,189,6,8,34,3,0,0,1,0,0,0
+10,22,Extended Discussion Rate,620,211,42,14,40,3,0,0,-1,0,0,0
+1,23,25,4,4,0,0,22,0,0,0,-1--1--1,,1|(726,48)|
+1,24,25,3,100,0,0,22,0,0,0,-1--1--1,,1|(726,144)|
+11,25,396,726,113,8,6,33,3,0,0,4,0,0,0
+10,26,Decision Failure Rate,789,113,55,8,40,3,0,0,-1,0,0,0
+1,27,29,1,4,0,0,22,0,0,0,-1--1--1,,1|(254,130)|
+1,28,29,4,100,0,0,22,0,0,0,-1--1--1,,1|(254,48)|
+11,29,236,254,86,8,6,33,3,0,0,2,0,0,0
+10,30,Issue Recycling Rate,193,86,53,8,40,3,0,0,-1,0,0,0
+10,31,Cap Issues First Time,506,128,54,8,8,3,0,0,0,0,0,0
+10,32,Agenda Cap,601,82,32,8,8,3,0,0,0,0,0,0
+1,33,31,7,1,0,0,0,0,128,0,-1--1--1,,1|(433,132)|
+1,34,32,31,0,0,0,0,0,128,0,-1--1--1,,1|(559,101)|
+1,35,21,31,1,0,0,0,0,128,0,-1--1--1,,1|(600,154)|
+1,36,1,7,1,0,0,0,0,128,0,-1--1--1,,1|(306,172)|
+1,37,2,12,1,0,0,0,0,128,0,-1--1--1,,1|(487,233)|
+1,38,2,21,1,0,0,0,0,128,0,-1--1--1,,1|(595,174)|
+1,39,13,22,1,0,0,0,0,128,0,-1--1--1,,1|(622,258)|
+12,40,48,731,341,10,8,0,3,0,0,-1,0,0,0
+1,41,43,40,4,0,0,22,0,0,0,-1--1--1,,1|(725,303)|
+1,42,43,3,100,0,0,22,0,0,0,-1--1--1,,1|(725,235)|
+11,43,48,725,268,8,6,33,3,0,0,4,0,0,0
+10,44,Actual Decision Rate 2,791,268,58,8,40,3,0,0,-1,0,0,0
+10,45,Recycle Delay,59,140,37,8,8,3,0,0,0,0,0,0
+10,46,Indicated Decision Rate,244,295,60,8,8,3,0,0,0,0,0,0
+10,47,Desired Time per Issue,155,242,58,8,8,3,0,0,0,0,0,0
+10,48,Time to Adapt Des Rate,188,341,37,14,8,3,0,0,0,0,0,0
+10,49,Desired Decision Rate,285,381,56,8,8,3,0,0,0,0,0,0
+10,50,Decision Pressure,408,434,45,8,8,3,0,0,0,0,0,0
+10,51,Effect on Shared Effort,556,461,58,8,8,3,0,0,0,0,0,0
+10,52,Adapted Normal Decision Rate,707,436,43,14,8,3,0,0,0,0,0,0
+1,53,52,44,1,0,0,0,0,128,0,-1--1--1,,1|(789,351)|
+1,54,52,13,1,0,0,0,0,128,0,-1--1--1,,1|(680,361)|
+10,55,Decision Skills,930,369,39,8,8,3,0,0,0,0,0,0
+10,56,Group Size,856,389,29,8,8,3,0,0,0,0,0,0
+10,57,Normal Decision Rate,874,439,56,8,8,3,0,0,0,0,0,0
+10,58,Effect on Time and Resources to Build Unanimity,556,410,49,21,8,3,0,0,0,0,0,0
+1,59,58,52,0,0,0,0,0,128,0,-1--1--1,,1|(627,421)|
+1,60,51,52,1,0,0,0,0,128,0,-1--1--1,,1|(623,459)|
+1,61,57,52,0,0,0,0,0,128,0,-1--1--1,,1|(790,437)|
+1,62,56,57,0,0,0,0,0,128,0,-1--1--1,,1|(862,407)|
+1,63,55,57,0,0,0,0,0,128,0,-1--1--1,,1|(906,398)|
+1,64,50,51,1,0,0,0,0,128,0,-1--1--1,,1|(458,450)|
+1,65,50,58,0,0,0,0,0,128,0,-1--1--1,,1|(473,423)|
+1,66,49,50,1,0,0,0,0,128,0,-1--1--1,,1|(339,415)|
+1,67,47,46,0,0,0,0,0,128,0,-1--1--1,,1|(192,264)|
+1,68,46,49,1,0,0,0,0,128,0,-1--1--1,,1|(254,329)|
+1,69,48,49,0,0,0,0,0,128,0,-1--1--1,,1|(236,361)|
+1,70,1,46,1,0,0,0,0,128,0,-1--1--1,,1|(242,234)|
+1,71,45,30,1,0,0,0,0,128,0,-1--1--1,,1|(93,104)|
+1,72,4,29,1,0,0,0,0,128,0,-1--1--1,,1|(305,75)|
+1,73,3,26,1,0,0,0,0,128,0,-1--1--1,,1|(785,151)|
+1,74,50,45,1,0,0,0,0,128,0,-1--1--1,,1|(241,440)|
+1,75,3,13,1,0,0,0,0,64,0,-1--1--1,,1|(675,249)|
+1,76,3,44,1,0,0,0,0,128,0,-1--1--1,,1|(781,223)|
+1,77,2,43,1,0,0,0,0,128,0,-1--1--1,,1|(602,235)|
+10,78,Normal Decision Rate,366,492,41,14,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,79,78,50,0,0,0,0,0,128,0,-1--1--1,,1|(384,465)|
+10,80,Decision Performance,785,596,56,8,8,3,0,0,0,0,0,0
+10,81,Actual Decision Rate 1,686,545,45,14,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,82,Actual Decision Rate 2,764,511,45,14,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,83,New Issue Inflow Rate,848,546,35,14,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,84,81,80,0,0,0,0,0,128,0,-1--1--1,,1|(734,570)|
+1,85,82,80,0,0,0,0,0,128,0,-1--1--1,,1|(773,549)|
+1,86,83,80,0,0,0,0,0,128,0,-1--1--1,,1|(818,569)|
+10,87,Table for Effect on Shared Effort,549,521,49,14,8,3,0,0,0,0,0,0
+1,88,87,51,0,0,0,0,0,128,0,-1--1--1,,1|(551,494)|
+10,89,Table for Effect on Time and Resources to Build Unanimity,437,345,63,21,8,3,0,0,0,0,0,0
+1,90,89,58,0,0,0,0,0,128,0,-1--1--1,,1|(489,374)|
+10,91,Table for Recycle Delay,61,52,39,14,8,3,0,0,0,0,0,0
+1,92,91,45,0,0,0,0,0,128,0,-1--1--1,,1|(60,92)|
+1,93,44,26,1,0,0,0,0,128,0,-1--1--1,,1|(840,187)|
+///---\\\
+:L<%^E!@
+1:Current.vdf
+9:Current
+22:$,Dollar,Dollars,$s
+22:Day,Days
+22:Hour,Hours
+22:Month,Months
+22:Person,People,Persons
+22:Unit,Units
+22:Week,Weeks
+22:Year,Years
+15:0,0,0,0,0,0
+19:100,0
+27:2,
+34:0,
+4:Time
+5:Decision Performance
+35:Date
+36:YYYY-MM-DD
+37:2000
+38:1
+39:1
+40:2
+41:0
+42:1
+24:0
+25:25
+26:25

@@ -1,0 +1,131 @@
+{UTF-8}
+Adopters A= INTEG (
+	Adoption Rate AR,
+		0)
+	~	Individuals
+	~		|
+
+Adoption Fraction i=
+	0.1
+	~	Individuals/Individual
+	~	Likelihood of adoption from word of mouth, given exposure.
+	|
+
+Adoption from Advertising=
+	Advertising Effectiveness a * Potential Adopters P
+	~	Individuals/Day
+	~		|
+
+Adoption from Word of Mouth=
+	Contact Rate c * Adoption Fraction i * Potential Adopters P * Adopters A / Total Population N
+	~	Individuals/Day
+	~		|
+
+Adoption Rate AR=
+	Adoption from Advertising + Adoption from Word of Mouth
+	~	Individuals/Day
+	~		|
+
+Advertising Effectiveness a=
+	0.001
+	~	Individuals/Individual/Day
+	~		|
+
+Contact Rate c=
+	5
+	~	Individuals/Individual/Day
+	~		|
+
+Potential Adopters P= INTEG (
+	-Adoption Rate AR,
+		500)
+	~	Individuals
+	~		|
+
+Total Population N=
+	1000
+	~	Individuals
+	~		|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 100
+	~	Day
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	Day
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP 
+	~	Day [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 1
+	~	Day [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|72,72,200,0
+10,1,Potential Adopters P,94,96,46,26,3,131,0,40,0,0,0,0,0-0-0,0-0-0,Helvetica|16||0-0-0
+10,2,Adopters A,434,96,46,26,3,131,0,40,0,0,0,0,0-0-0,0-0-0,Helvetica|16||0-0-0
+1,3,5,2,4,0,0,22,0,0,0,-1--1--1,,1|(327,96)|
+1,4,5,1,100,0,0,22,0,0,0,-1--1--1,,1|(197,96)|
+11,5,0,261,96,6,8,34,3,0,0,1,0,0,0
+10,6,Adoption Rate AR,261,123,39,19,40,131,0,40,-1,0,0,0,0-0-0,0-0-0,Helvetica|16||0-0-0
+10,7,Adoption from Advertising,167,192,53,16,8,3,0,40,0,0,0,0,0-0-0,0-0-0,Helvetica|16||0-0-0
+10,8,Adoption from Word of Mouth,367,192,56,16,8,3,0,40,0,0,0,0,0-0-0,0-0-0,Helvetica|16||0-0-0
+10,9,Advertising Effectiveness a,220,265,57,16,8,3,0,40,0,0,0,0,0-0-0,0-0-0,Helvetica|16||0-0-0
+10,10,Total Population N,546,174,49,16,8,3,0,40,0,0,0,0,0-0-0,0-0-0,Helvetica|16||0-0-0
+10,11,Adoption Fraction i,538,231,35,16,8,3,0,40,0,0,0,0,0-0-0,0-0-0,Helvetica|16||0-0-0
+10,12,Contact Rate c,485,291,55,9,8,3,0,40,0,0,0,0,0-0-0,0-0-0,Helvetica|16||0-0-0
+1,13,1,7,1,0,43,0,0,128,0,-1--1--1,,1|(98,163)|
+1,14,7,6,1,0,43,0,0,128,0,-1--1--1,,1|(233,156)|
+1,15,8,6,1,0,43,0,0,128,0,-1--1--1,,1|(290,159)|
+1,16,2,8,1,0,43,0,2,0,0,-1--1--1,|0||-1--1--1,1|(447,172)|
+1,17,10,8,1,0,45,0,0,128,0,-1--1--1,,1|(449,205)|
+1,18,11,8,1,0,43,0,0,128,0,-1--1--1,,1|(415,225)|
+1,19,12,8,1,0,43,0,2,128,0,-1--1--1,|0||-1--1--1,1|(383,236)|
+1,20,9,7,1,0,43,0,2,192,0,-1--1--1,|0||-1--1--1,1|(173,231)|
+1,21,1,8,1,0,43,0,2,64,0,-1--1--1,|0||-1--1--1,1|(195,322)|
+///---\\\
+:L<%^E!@
+1:Current.vdf
+9:Current
+22:$,Dollar,Dollars,$s
+22:Day,Days
+22:Hour,Hours
+22:Individual,Individuals
+22:Month,Months
+22:Person,People,Persons
+22:Unit,Units
+22:Week,Weeks
+22:Year,Years
+15:0,0,0,0,0,0
+19:200,0
+27:2,
+34:0,
+4:Time
+5:Adopters A
+35:Date
+36:YYYY-MM-DD
+37:2000
+38:1
+39:1
+40:4
+41:0
+42:1
+24:0
+25:100
+26:100

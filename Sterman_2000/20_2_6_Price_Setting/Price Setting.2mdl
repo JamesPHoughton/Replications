@@ -1,0 +1,247 @@
+{UTF-8}
+Change in Perceived Inventory Coverage=
+	(Inventory Coverage - Perceived Inventory Coverage)/Coverage Perception Time
+	~	Years/Year
+	~		|
+
+Change in Traders Expected Price=
+	(Indicated Price - "Traders Expected Price P*")/Expectation Adjustment Time
+	~	Dollars/Year
+	~		|
+
+Coverage Perception Time=
+	0.5
+	~	Year
+	~		|
+
+Effect of Costs on Price=
+	1 + Sensitivity of Price to Costs * (Expected Production Costs / "Traders Expected Price P*"\
+		 - 1)
+	~	Dmnl
+	~		|
+
+Effect of Inventory Coverage on Price=
+	(Perceived Inventory Coverage/Reference Inventory Coverage)^Sensitivity of Price to Inventory Coverage
+	~	Dmnl
+	~		|
+
+Expectation Adjustment Time=
+	1
+	~	Year
+	~		|
+
+Expected Production Costs=
+	10
+	~	Dollars
+	~		|
+
+Indicated Price=
+	MAX(Price P, Minimum Price)
+	~	Dollars
+	~	Market makers know that equilibrium prices cannot fall below the minimum \
+		costs of bringing product to market. Here the minimum price is set to the \
+		expected unit variable cost of production.
+	|
+
+Initial Perceived Inventory Coverage=
+	0.5
+	~	Year
+	~		|
+
+"Initial Traders Expected Price P*"=
+	10
+	~	Dollars
+	~		|
+
+Inventory=
+	50
+	~	units
+	~		|
+
+Inventory Coverage=
+	Inventory/Shipments
+	~	Year
+	~	Inventory coverage (the ratio of available inventory to shipments) is an \
+		excellent measure of both inventory carrying costs for producers and the \
+		ability of buyers to receive reliable, timely deliveries
+	|
+
+Minimum Price=
+	7
+	~	Dollars
+	~	Here the minimum price is set to the expected unit variable cost of \
+		production.
+	|
+
+Perceived Inventory Coverage= INTEG (
+	Change in Perceived Inventory Coverage,
+		Initial Perceived Inventory Coverage)
+	~	Year
+	~	Price depends on perceived coverage, not instantaneous coverage, because \
+		the in- stantaneous shipment rate is not known. It takes time to gather \
+		and report data on inventory and shipments. For simplicity, perceived \
+		coverage is modeled with first-order smoothing.
+	|
+
+Price P=
+	"Traders Expected Price P*" * Effect of Costs on Price * Effect of Inventory Coverage on Price
+	~	Dollars
+	~	price is anchored on the Traders’ Expected price, representing \
+		traders’ beliefs about the market-clearing price. Actual price is \
+		adjusted up or down from the anchor in response to various pressures. In \
+		this simple model, adjustments arise from the demand supply balance and \
+		traders’ beliefs about the underlying costs of production.
+	|
+
+Reference Inventory Coverage=
+	0.5
+	~	Year
+	~	Normal, or Desired level of inventory coverage
+	|
+
+Sensitivity of Price to Costs=
+	0.5
+	~	Dmnl [0,1]
+	~	If the Sensitivity of Price to Costs = 0, then cost information is ignored \
+		in price setting. If Sensitivity of Price to Costs = 1, then traders' \
+		beliefs about the equilibrium price are ignored and prices are anchored on \
+		expected costs instead
+	|
+
+Sensitivity of Price to Inventory Coverage=
+	-0.5
+	~	Dmnl [?,0]
+	~	A simple and flexible function is given by the power function y = xa where \
+		the exponent a, the Sensitivity of Price to Inventory Coverage, must be \
+		negative (higher inventory coverage leads to lower prices)
+	|
+
+Shipments=
+	100
+	~	units/Year
+	~		|
+
+"Traders Expected Price P*"= INTEG (
+	Change in Traders Expected Price,
+		"Initial Traders Expected Price P*")
+	~	Dollars
+	~	Also called expected price
+	|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 20
+	~	Year
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	Year
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP 
+	~	Year [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 1
+	~	Year [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|72,72,100,0
+10,1,Price P,363,281,19,8,8,3,0,0,0,0,0,0
+10,2,"Traders Expected Price P*",417,127,40,20,3,3,0,0,0,0,0,0
+12,3,48,241,127,10,8,0,3,0,0,-1,0,0,0
+1,4,6,2,4,0,0,22,0,0,0,-1--1--1,,1|(348,127)|
+1,5,6,3,100,0,0,22,0,0,0,-1--1--1,,1|(279,127)|
+11,6,0,314,127,6,8,34,3,0,0,1,0,0,0
+10,7,Change in Traders Expected Price,314,149,47,14,40,3,0,0,-1,0,0,0
+1,8,1,17,1,0,43,0,0,128,0,-1--1--1,,1|(295,271)|
+1,9,2,6,1,0,45,0,0,128,0,-1--1--1,,1|(360,94)|
+10,10,Expectation Adjustment Time,269,70,45,14,8,3,0,0,0,0,0,0
+1,11,10,6,0,0,45,0,0,128,0,-1--1--1,,1|(290,97)|
+1,12,2,1,1,0,43,0,0,128,0,-1--1--1,,1|(434,252)|
+10,13,Effect of Inventory Coverage on Price,456,366,49,14,8,3,0,0,0,0,0,0
+10,14,Effect of Costs on Price,562,264,59,8,8,3,0,0,0,0,0,0
+1,15,14,1,1,0,43,0,0,128,0,-1--1--1,,1|(436,301)|
+1,16,13,1,1,0,43,0,0,128,0,-1--1--1,,1|(380,307)|
+10,17,Indicated Price,255,224,38,8,8,3,0,0,0,0,0,0
+1,18,17,7,1,0,43,0,0,128,0,-1--1--1,,1|(253,186)|
+10,19,Reference Inventory Coverage,471,460,51,14,8,3,0,0,0,0,0,0
+10,20,Perceived Inventory Coverage,604,380,40,20,3,3,0,0,0,0,0,0
+10,21,Inventory Coverage,734,470,50,8,8,3,0,0,0,0,0,0
+12,22,48,766,377,10,8,0,3,0,0,-1,0,0,0
+1,23,25,20,4,0,0,22,0,0,0,-1--1--1,,1|(669,377)|
+1,24,25,22,100,0,0,22,0,0,0,-1--1--1,,1|(731,377)|
+11,25,0,700,377,6,8,34,3,0,0,1,0,0,0
+10,26,Change in Perceived Inventory Coverage,700,399,53,14,40,3,0,0,-1,0,0,0
+1,27,19,13,0,0,43,0,0,128,0,-1--1--1,,1|(464,419)|
+1,28,20,25,1,0,45,0,0,128,0,-1--1--1,,1|(656,329)|
+1,29,21,26,0,0,43,0,0,128,0,-1--1--1,,1|(721,443)|
+1,30,20,13,0,0,45,0,0,128,0,-1--1--1,,1|(541,374)|
+10,31,Coverage Perception Time,756,306,43,14,8,3,0,0,0,0,0,0
+1,32,31,25,0,0,45,0,0,128,0,-1--1--1,,1|(728,340)|
+10,33,Sensitivity of Price to Inventory Coverage,327,421,56,14,8,3,0,0,0,0,0,0
+1,34,33,13,0,0,43,0,0,128,0,-1--1--1,,1|(384,396)|
+10,35,Inventory,755,530,26,8,8,3,0,0,0,0,0,0
+10,36,Shipments,853,495,28,8,8,3,0,0,0,0,0,0
+1,37,35,21,0,0,43,0,0,128,0,-1--1--1,,1|(747,506)|
+1,38,36,21,0,0,0,0,0,128,0,-1--1--1,,1|(805,485)|
+1,39,2,14,1,0,45,0,0,128,0,-1--1--1,,1|(545,158)|
+10,40,Sensitivity of Price to Costs,641,189,36,14,8,3,0,0,0,0,0,0
+10,41,Expected Production Costs,740,245,44,14,8,3,0,0,0,0,0,0
+1,42,40,14,0,0,43,0,0,128,0,-1--1--1,,1|(603,224)|
+1,43,41,14,0,0,43,0,0,128,0,-1--1--1,,1|(665,252)|
+10,44,Minimum Price,181,285,40,8,8,3,0,0,0,0,0,0
+1,45,44,17,0,0,43,0,0,128,0,-1--1--1,,1|(212,258)|
+10,46,"Initial Traders Expected Price P*",448,77,47,14,8,3,0,0,0,0,0,0
+10,47,Initial Perceived Inventory Coverage,602,429,52,14,8,3,0,0,0,0,0,0
+1,48,47,20,0,0,0,0,0,64,1,-1--1--1,,1|(602,414)|
+1,49,46,2,0,0,0,0,0,64,1,-1--1--1,,1|(438,93)|
+12,50,0,500,171,20,20,4,7,0,3,-1,0,0,0,255-0-0,0-0-0,|0||255-0-0
+B
+12,51,0,501,203,35,8,8,7,0,2,-1,0,0,0,-1--1--1,0-0-0,|0||255-0-0
+Cost Pressure
+12,52,0,356,200,20,20,4,7,0,3,-1,0,0,0,255-0-0,0-0-0,|0||255-0-0
+R
+12,53,0,356,232,44,8,8,7,0,3,-1,0,0,0,255-0-0,0-0-0,|0||255-0-0
+Price Adjustment
+///---\\\
+:L<%^E!@
+1:Current.vdf
+9:Current
+22:$,Dollar,Dollars,$s
+22:Day,Days
+22:Hour,Hours
+22:Month,Months
+22:Person,People,Persons
+22:Unit,Units
+22:Week,Weeks
+22:Year,Years
+15:0,0,0,0,0,0
+19:100,0
+27:2,
+34:0,
+4:Time
+5:Effect of Costs on Price
+35:Date
+36:YYYY-MM-DD
+37:2000
+38:1
+39:1
+40:0
+41:0
+42:0
+24:0
+25:20
+26:20
