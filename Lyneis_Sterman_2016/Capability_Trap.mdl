@@ -1,0 +1,1203 @@
+{UTF-8}
+Required Labor=
+	Labor*(1+Sensitivity of Labor to Output Shortfall*Output Shortfall+Sensitivity of Labor to Capabilities\
+		)
+	~	People
+	~	Required labor increases with the output shortfall.  The sensitivity of \
+		labor to the shortfall determines how many people are sought in response \
+		to a given output gap.  Required labor will also increase to provide \
+		resources to boost capabilities, according to the Sensitivity of Labor to \
+		Capabilities.
+	|
+
+Sensitivity of Labor to Capabilities=
+	0
+	~	Dmnl
+	~	When positive, this parameter causes the firm to seek additional workers \
+		to improve capabilities, even if there is no output shortfall.  The actual \
+		workforce will then increase unless constrained by the authorized labor \
+		force.  The default value is 0, implying hiring does not respond to \
+		capabilities.  The larger the value, the more responsive hiring is to the \
+		pressure to improve capabilities.
+	|
+
+Increase in Time Spent Working=
+	0
+	~	Hours/week [-10,10,1]
+	~	The magnitude of the exogenous increase in work effort, occuring at time \
+		zero.
+	|
+
+Time Spent Improving=
+	MAX(0, MIN(Maximum Workweek-Time Spent Working, Required Improvement Effort))
+	~	Hours/week
+	~	The time spent on capability development and improvement is given by the \
+		required improvement effort or the time available for improvmeent, \
+		whichever is less.
+	|
+
+Output=
+	Labor*Time Spent Working*Productivity
+	~	Units/week
+	~	Actual output is the product of the labor force,  work hours per week \
+		spent on work effort (vs. improvement), and productivity.
+	|
+
+Change in Time Spent Working=
+	Time Spent Working*Sensitivity of Work Effort to Output*Output Shortfall*(Maximum Workweek\
+		-Time Spent Working)/Maximum Workweek
++(Increase in Time Spent Working/TIME STEP)*PULSE( 0, TIME STEP )
+	~	Hours/week/Year
+	~	The amount of time spent working on average changes in proportion to the \
+		output shortfall.  Positive shortfalls lead to an increase in hours per \
+		person spent working (vs. improvement and capability development); a \
+		negative shortfall (more output than required) leads to a reduction of \
+		hours spent working.  The time spent working cannot rise above the maximum \
+		workweek, so the rate of increase falls to zero as the time spent working \
+		approaches the maximum.  In addition, the time spent working can increase \
+		by a fixed amount at time zero (the Increase in Time Spent Working), using \
+		the pulse function.
+	|
+
+Increase in Time Spent Improving=
+	-Increase in Time Spent Working
+	~	Hours/week
+	~	If additional time is allocated to working harder (as an exogenous test), \
+		the time allocated to working smarter falls by the same amount.
+	|
+
+Change in Required Improvement Effort=
+	Time Spent Improving*Sensitivity of Improvement Effort to Output*Output Shortfall*(Maximum Workweek\
+		-Time Spent Improving
+	)/Maximum Workweek+(Increase in Time Spent Improving/TIME STEP)*PULSE(0,TIME STEP)
+	~	Hours/(Year*week)
+	~	The time spent on capability development and improvement increases in \
+		proportion to the output shortfall, with a gain determined by the \
+		sensitivity of improvement to output.  The increase falls as the time \
+		spent improving approaches the maximum workweek.  In addition, the time \
+		for improvement can increase exogenously by a certain amount at time zero \
+		as a test input (determined by the pulse function).
+	|
+
+Maximum Workweek=
+	70
+	~	Hours/week [40,100,1]
+	~	The maximum average workweek for the workforce.
+	|
+
+Ramp in Required Output=
+	0
+	~	Units/week/Year [0,50,1]
+	~	The slope of a linear ramp in required output, in units per year/year \
+		added to the initial required output rate.
+	|
+
+Authorized Labor=
+	MAX(0, Initial Labor*(1+STEP(Fractional Change in Labor,Time to Change Labor) + RAMP\
+		(Ramp in Labor,0,6)))
+	~	People
+	~	Authorized Labor can be increased or decreased by a certain amount at time \
+		zero, or follow a linear ramp with slope "Ramp in Labor".
+	|
+
+Ramp in Labor=
+	0
+	~	1/Year [-0.5,0.5,0.05]
+	~	The slope of a linear ramp in authorized labor, as a fraction of the \
+		initial labor force.
+	|
+
+Fraction of Time Spent Improving=
+	Time Spent Improving/Work Week
+	~	Dmnl
+	~	The fraction of the workweek spent on improvement and capability \
+		development (vs. work effort).
+	|
+
+Fractional Change in Labor=
+	0
+	~	Dmnl [-1,1,0.01]
+	~	An exogenous fractional change in the authorized labor force, representing \
+		the impact of budget cuts in the workforce.
+	|
+
+Productivity=
+	Reference Productivity*Capabilities
+	~	Units/(Hours*Person)
+	~	For simplicity, productivity (units of output per person-hour of work \
+		effort) is proportional to organizational capabilities.  Reference \
+		productivity is set to initialize the model in equilibrium.
+	|
+
+Capabilities= INTEG (
+	Capability Increase-Capability Decrease,
+		Initial Capabilities)
+	~	Dmnl
+	~	The capabilities of the organization are a stock, increased by improvement \
+		effort and investment in capability development, and decreased as \
+		capabilities erode.
+	|
+
+Initial Labor=
+	100
+	~	People
+	~	The initial labor force.  Set by the user.
+	|
+
+Reference Productivity= INITIAL(
+	Initial Required Output/(Initial Labor*Standard Workweek*Reference Fraction of Effort to Output\
+		))
+	~	Units/(Hours*Person)
+	~	The initial value of productivity.  Set to initialize the model in \
+		equilibrium.
+	|
+
+Capability Increase=
+	Labor*Time Spent Improving*Productivity of Improvement Effort*(Maximum Capabilities-\
+		Capabilities)/Maximum Capabilities
+	~	1/Year
+	~	Capabilities increase as the result of effort applied to improvement \
+		effort and capability development.  Improvement is determined by the \
+		product of the labor force, the average time per person per week spent on \
+		improvement and the productivity of improvement effort.  Improvement \
+		slows, however, as capabilities approach their maximum value.
+	|
+
+Work Week=
+	Time Spent Working+Time Spent Improving
+	~	Hours/week
+	~	The total workweek is the sum of the time spent working and time spent \
+		improving.
+	|
+
+Fraction of Time Spent Working=
+	Time Spent Working/Work Week
+	~	Dmnl
+	~	The fraction of the workweek spent on work effort (vs improvement).
+	|
+
+Sensitivity of Work Effort to Output=
+	0
+	~	1/Year [0,10,0.25]
+	~	The larger the sensitivity, the more responsive work effort will be to the \
+		output shortfall.  The default value is zero.
+	|
+
+Time to Change Labor=
+	0
+	~	Year
+	~	The time at which the change in authorized labor occurs.
+	|
+
+Productivity of Improvement Effort= INITIAL(
+	Initial Capabilities*Average Capability Loss Rate*(Maximum Capabilities/(Maximum Capabilities\
+		-1))/(Initial Labor*Standard Workweek*(1-Reference Fraction of Effort to Output)))
+	~	(1/(Person*Hours/week))/Year [0,0.01]
+	~	The productivity of improvement effort is the increase in capabilities per \
+		person-hour of improvement effort.  It is set so that the simulations \
+		begin in equilibrium, with the time spent on improvement given by the \
+		standard workweek less the initial time spent working, and with the \
+		increase in capabilities offsetting capability erosion.
+	|
+
+Sensitivity of Improvement Effort to Output=
+	0
+	~	1/Year [0,1,0.1]
+	~	The larger the sensitivity, the more responsive improvement effort will be \
+		to the output shorftall.  The default value is zero.
+	|
+
+Time Spent Working= INTEG (
+	Change in Time Spent Working,
+		Standard Workweek*Reference Fraction of Effort to Output)
+	~	Hours/week
+	~	The average number of hours each worker spends each week producing (vs. \
+		improvement effort).
+	|
+
+Required Improvement Effort= INTEG (
+	Change in Required Improvement Effort,
+		Standard Workweek*(1 - Reference Fraction of Effort to Output))
+	~	Hours/week
+	~	The number of hours per person per week needed to improve capabilities, \
+		based on the cumulative response to the output shortfall.  Actual \
+		improvement hours per week depend on the time available after work effort \
+		is accounted for.
+	|
+
+Adjustment for Labor=
+	(Target Labor-Labor)/Labor Adjustment Time
+	~	People/Year
+	~	Hiring is increased above or below the replacement of those who quit in \
+		proportion to the gap between the target and actual workforce.  The labor \
+		adjustment time governs how quickly the firm seeks to close that gap.
+	|
+
+Attrition=
+	DELAY3I(Hiring,Average Duration of Employment, Initial Labor/Average Duration of Employment\
+		)
+	~	People/Year
+	~	Workers stay with the firm for a period given by the average duration of \
+		employment; the attrition profile is a third order Erlang lag.
+	|
+
+Initial Required Output=
+	100
+	~	Units/week
+	~	The initial value for required output.  100 can be thought of as an index \
+		value (100% of the initial level of required output).
+	|
+
+Average Duration of Employment=
+	2
+	~	Years
+	~	The average tenure of a worker.
+	|
+
+Sensitivity of Labor to Output Shortfall=
+	0
+	~	Dmnl [0,1,0.05]
+	~	When positive, this parameter causes the firm to seek additional workers \
+		to close the gap between required and actual output.  The actual workforce \
+		will then increase unless constrained by the authorized labor force.  The \
+		default value is 0, implying hiring does not respond to the output \
+		shortfall.  The larger the value, the more responsive hiring is to a given \
+		output gap.
+	|
+
+Hiring=
+	MAX(0, Attrition+Adjustment for Labor)
+	~	People/Year
+	~	Hiring replaces those who leave (attrition) and adjusts the workforce \
+		toward the authorized level.  The max function means there is a no layoff \
+		policy.
+	|
+
+Required Output=
+	Initial Required Output*(1+STEP(Step in Required Output,0))+RAMP(Ramp in Required Output\
+		, 0 , 6 )
+	~	Units/week
+	~	The required level of output.  Set by the user; begins at the reference \
+		value, and can be increased by a certain amount, or follow a linear ramp \
+		with a user-determined slope.
+	|
+
+Step in Required Output=
+	0
+	~	Dmnl [0,2,0.01]
+	~	The fractional step increase in required output.  Set by the user.
+	|
+
+Labor= INTEG (
+	Hiring-Attrition,
+		Initial Labor)
+	~	People
+	~	The labor force.  Increased by hiring and reduced by attrition.
+	|
+
+Labor Adjustment Time=
+	0.25
+	~	Years
+	~	The average time over which the firm seeks to close the gap between the \
+		target and actual labor force.
+	|
+
+Target Labor=
+	MIN(Authorized Labor,Required Labor)
+	~	People
+	~	The target used to determine hiring is the required number of workers \
+		given the output shortfall or the authorized number (based on budget or \
+		other consideration), whichever is less.
+	|
+
+Capability Decrease=
+	DELAY N(Capability Increase, 1/Average Capability Loss Rate, Capabilities*Average Capability Loss Rate\
+		, Capability Delay Order)
+	~	1/Year
+	~	Capabilities erode over time after a certain delay, with a mean lag given \
+		by the reciprocal of the fractional capability erosion rate. Capability \
+		erosion is modeled as an Erlang lag.  The user can specify the order of \
+		the delay.
+	|
+
+Capability Delay Order=
+	3
+	~	Dmnl [1,6,1]
+	~	The order of the delay governing capability erosion.
+	|
+
+Reference Fraction of Effort to Output=
+	0.8
+	~	Dmnl [0,1]
+	~	The initial fraction of the workweek devoted to output.  The remainder is \
+		devoted to improvement and investment in capabilities.
+	|
+
+Average Capability Loss Rate=
+	0.5
+	~	1/Year
+	~	The fractional rate at which capabilities erode as personnel turn over and \
+		as environmental, technological, competitive and other conditions change.
+	|
+
+Initial Capabilities=
+	1
+	~	Dmnl
+	~	The initial level of capabilities, determined by the user.
+	|
+
+Maximum Capabilities=
+	10
+	~	Dmnl
+	~	The maximum level of capabilities, determined by the user.
+	|
+
+Output Shortfall=
+	(Required Output-Output)/Required Output
+	~	Dmnl
+	~	The gap between required and actual output, as a fraction of required \
+		output.
+	|
+
+Standard Workweek=
+	40
+	~	Hours/week
+	~	The normal workweek.
+	|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 5
+	~	Year
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = -1
+	~	Year
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP
+	~	Year [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 0.015625
+	~	Year [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Introduction and Overview
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|72,72,100,0
+12,1,0,371,-34,131,18,8,135,0,58,-1,0,0,0,-1--1--1,0-0-0,Arial|24|B|0-0-255
+The Capability Trap
+12,2,0,378,-12,267,13,8,135,0,56,-1,0,0,0,-1--1--1,0-0-0,Arial|14|B|0-0-0
+This model provides a simple interactive simulation of the Capability Trap.
+12,3,0,361,53,340,27,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+Repenning and Sterman (2001, 2002) developed the theory of the capability trap to explain the failure of many process improvement programs.  Sterman (2015) applies the theory to sustainability and pro-social investments; Lyneis and Sterman (2016) expand the theory to the case of energy efficiency in a large research University.
+12,4,0,373,12,241,12,8,135,0,56,-1,0,0,0,-1--1--1,0-0-0,Arial|14|B|0-0-0
+John Sterman, MIT Sloan School of Management.  jsterman@mit.edu
+12,5,0,373,101,347,31,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+The managers of any process, whether production, product development, maintenance, human resources, or environmental quality, are responsible for the performance of that process against target or desired performance.  If performance falls short of the target, managers have two basic options to close the gap:  working harder or working smarter.  
+12,6,0,378,158,374,43,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+Working harder includes adding resources (hiring, capacity expansion), increasing resource utilization (overtime, shorter breaks, speeding up), and boosting output per person-hour by cutting corners (skipping steps, cutting testing, deferring maintenance, failing to follow safety procedures).  These activities form the balancing (i.e., negative) Work Harder feedback, B1:  a performance shortfall leads to longer hours, corner cutting, deferring maintenance, and other shortcuts that improve performance.  
+12,7,0,380,220,370,30,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+Alternatively, managers can interpret the performance gap as a sign that the organization’s capabilities are inadequate.  They can increase improvement activity designed to eliminate the root causes of poor performance and invest in the capabilities that make improvement effort effective, including investments that enhance people’s skills, knowledge of and adherence to best practices, and build cooperation and trust across organizational boundaries.  
+12,8,0,381,260,253,10,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+Investing in capability improvement forms the balancing Work Smarter feedback, B2. 
+12,9,0,373,301,376,31,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+The organization’s capabilities are shown as a stock.  Capabilities—including productive, well-maintained equipment, skilled workers, effective improvement methods, organizational routines, and trust between workers and management and across organizational boundaries—are assets that build up as the result of investment and erode over time as equipment ages, employees leave, and changes in the environment render skills, knowledge, routines and relationships obsolete.
+12,10,0,373,359,366,28,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+Working harder and working smarter interact because time and resources are limited.  When organizations are heavily loaded and resources constrained, greater work effort necessarily comes at the expense of maintenance, improvement, learning, training, coordination and other activities needed to preserve and enhance capabilities. 
+12,11,0,377,404,353,23,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+The result is the reinforcing (i.e., positive) feedback denoted Reinvestment or Ruin (R1).  As the name suggests, the reinforcing feedback can operate as a virtuous cycle that builds capabilities and performance, or as a vicious cycle that degrades both.  
+12,12,0,387,455,374,41,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+An organization that increases the time and resources devoted to improvement sufficiently will, after a lag, build capabilities that boost performance, easing the performance gap and yielding still more time and resources for improvement.  In contrast, if managers respond to a performance gap with greater pressure to boost output, improvement effort falls, the organization’s capabilities erode, and the throughput gap grows still larger, forcing ever-greater reliance on working harder.  
+12,13,0,389,507,373,19,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+The vicious cycle drives out improvement activity, leading to low capabilities and poor performance, and, all too often, environmental damage, accidents, or organizational failure.
+10,14,Capabilities,987,167,47,25,3,131,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+12,15,48,806,168,10,8,0,3,0,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,16,18,14,4,0,0,22,0,0,0,-1--1--1,,1|(909,168)|
+1,17,18,15,100,0,0,22,2,0,0,-1--1--1,|12||0-0-0,1|(841,168)|
+11,18,48,872,168,6,8,34,3,0,0,1,0,0,0
+10,19,Capability Increase,872,192,47,16,40,131,0,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+12,20,48,1193,168,10,8,0,3,0,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,21,23,20,4,0,0,22,0,0,0,-1--1--1,,1|(1147,166)|
+1,22,23,14,100,0,0,22,0,0,0,-1--1--1,,1|(1067,166)|
+11,23,48,1106,166,6,8,34,3,0,0,1,0,0,0
+10,24,Capability Decrease,1106,190,36,16,40,131,0,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,25,14,23,1,0,0,0,0,64,1,-1--1--1,,1|(1048,82)|
+10,26,Average Capability Loss Rate,1135,42,55,24,8,2,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,27,26,23,1,1,0,0,0,64,0,-1--1--1,,1|(1100,144)|
+10,28,Required Output,1263,365,50,16,8,131,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,29,Output Shortfall,1198,435,56,9,8,3,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,30,Output,1113,317,28,13,8,131,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,31,Time Spent Improving,826,349,41,20,8,131,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,32,30,29,1,0,45,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(1201,387)|
+1,33,28,29,1,0,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(1256,400)|
+1,34,31,19,1,0,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(846,222)|
+10,35,Productivity of Improvement Effort,724,241,68,16,8,3,1,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,36,35,19,1,1,43,13,32,64,0,-1--1--1,Arial|12||0-0-0,1|(799,200)|
+1,37,14,19,1,1,0,0,0,64,0,-1--1--1,,1|(951,219)|
+1,38,18,23,1,1,0,0,0,64,0,-1--1--1,,1|(973,82)|
+10,39,Step in Required Output,1413,314,62,16,8,2,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,40,39,28,1,1,0,13,0,64,0,-1--1--1,,1|(1424,283)|
+10,41,Initial Required Output,1578,220,58,16,8,2,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,42,41,28,1,1,0,13,0,64,0,-1--1--1,,1|(1429,288)|
+1,43,14,50,1,1,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(1096,227)|
+10,44,Labor,1201,268,30,9,8,2,1,59,-1,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,45,44,30,1,1,43,13,32,64,0,-1--1--1,Arial|12||0-0-0,1|(1162,295)|
+1,46,60,30,1,0,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(1057,314)|
+10,47,Maximum Workweek,825,306,41,16,8,2,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,48,47,31,1,1,43,13,34,64,0,-1--1--1,Arial|12||0-0-0,1|(880,351)|
+1,49,60,31,1,0,45,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(896,387)|
+10,50,Productivity,1102,235,43,9,8,3,1,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,51,Reference Productivity,1186,196,43,16,8,3,1,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,52,51,50,1,1,43,0,32,64,0,-1--1--1,Arial|12||0-0-0,1|(1159,220)|
+1,53,50,30,1,1,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(1116,277)|
+10,54,Labor,755,120,30,9,8,2,1,59,-1,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,55,54,19,1,1,43,13,34,128,0,-1--1--1,Arial|12||0-0-0,1|(794,199)|
+1,56,26,35,1,0,0,0,0,64,1,-1--1--1,,1|(610,55)|
+1,57,41,51,0,0,0,13,0,64,1,-1--1--1,,1|(1383,208)|
+10,58,Maximum Workweek,1099,506,41,16,8,2,1,59,-1,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,59,58,65,1,1,0,0,0,64,0,-1--1--1,,1|(1074,488)|
+10,60,Time Spent Working,982,380,40,16,8,3,0,56,0,0,0,0,-1--1--1,0-0-0,Arial|14|B|0-0-0
+12,61,48,981,496,10,8,0,3,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,62,64,60,4,1,0,22,0,0,0,-1--1--1,,1|(990,420)|
+1,63,64,61,100,1,0,22,0,0,0,-1--1--1,,1|(990,472)|
+11,64,48,990,450,8,6,33,3,1,0,4,0,0,0
+10,65,Change in Time Spent Working,1053,450,55,16,40,131,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,66,Sensitivity of Work Effort to Output,1056,540,50,24,8,130,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,67,66,65,0,1,0,0,0,64,0,-1--1--1,,1|(1054,497)|
+1,68,29,65,1,1,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(1117,486)|
+1,69,60,64,1,1,0,0,0,64,0,-1--1--1,,1|(964,404)|
+1,70,47,76,1,1,0,0,0,64,0,-1--1--1,,1|(836,400)|
+10,71,Required Improvement Effort,791,437,49,23,3,131,1,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+12,72,48,791,549,10,8,0,3,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,73,75,71,4,1,0,22,0,0,0,-1--1--1,,1|(791,484)|
+1,74,75,72,100,1,0,22,0,0,0,-1--1--1,,1|(791,531)|
+11,75,48,791,515,8,6,33,3,1,0,2,0,0,0
+10,76,Change in Required Improvement Effort,713,515,70,16,40,131,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,77,Sensitivity of Improvement Effort to Output,772,432,58,21,8,2,1,3,0,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,78,77,76,1,1,0,0,0,64,0,-1--1--1,,1|(802,490)|
+1,79,29,75,1,1,43,13,34,128,0,-1--1--1,Arial|12||0-0-0,1|(985,476)|
+1,80,31,75,1,1,0,0,0,64,0,-1--1--1,,1|(765,462)|
+1,81,71,31,1,1,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(808,363)|
+12,82,48,981,496,10,8,0,3,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+12,83,0,946,253,20,20,4,7,0,51,-1,0,0,0,255-0-0,0-0-0,Arial|12|B|255-0-0
+R1
+12,84,0,946,292,42,14,8,135,0,51,-1,0,0,0,255-0-0,0-0-0,Arial|12|B|255-0-0
+Reinvestment or Ruin
+12,85,0,1090,390,20,20,4,7,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+B1
+12,86,0,1092,429,42,15,8,135,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Working Harder
+12,87,0,925,452,20,20,4,7,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+B2
+12,88,0,926,492,38,14,8,135,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Working Smarter
+10,89,Ramp in Required Output,1240,299,54,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,90,89,28,0,1,0,0,0,64,0,-1--1--1,,1|(1248,324)|
+10,91,TIME STEP,1067,513,41,8,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,92,91,65,0,1,0,0,0,64,0,-1--1--1,,1|(1062,492)|
+1,93,96,76,0,1,0,0,0,64,0,-1--1--1,,1|(734,504)|
+10,94,TIME STEP,837,590,41,8,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,95,94,76,0,1,0,0,0,64,0,-1--1--1,,1|(787,560)|
+10,96,Increase in Time Spent Improving,739,502,47,14,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,97,Increase in Time Spent Working,1019,537,54,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,98,97,65,0,1,0,0,0,64,0,-1--1--1,,1|(1032,501)|
+10,99,Initial Capabilities,987,206,40,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,100,99,14,0,0,0,0,0,64,1,-1--1--1,,1|(987,199)|
+10,101,Maximum Capabilities,891,204,40,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,102,101,19,0,1,0,0,0,64,0,-1--1--1,,1|(888,202)|
+10,103,Capability Delay Order,1085,205,40,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,104,103,24,0,0,0,0,0,64,1,-1--1--1,,1|(1087,202)|
+1,105,99,35,0,0,0,0,0,64,1,-1--1--1,,1|(876,220)|
+10,106,Initial Labor,724,178,43,8,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,107,106,35,0,0,0,0,0,64,1,-1--1--1,,1|(724,198)|
+1,108,101,35,0,0,0,0,0,64,1,-1--1--1,,1|(828,216)|
+10,109,Reference Fraction of Effort to Output,724,178,61,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,110,109,35,0,0,0,0,0,64,1,-1--1--1,,1|(724,201)|
+10,111,Standard Workweek,871,222,35,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,112,111,35,0,0,0,0,0,64,1,-1--1--1,,1|(820,228)|
+1,113,106,51,0,0,0,0,0,64,1,-1--1--1,,1|(948,186)|
+1,114,109,51,0,0,0,0,0,64,1,-1--1--1,,1|(957,186)|
+1,115,111,51,0,0,0,0,0,64,1,-1--1--1,,1|(1017,210)|
+1,116,109,60,0,0,0,0,0,64,1,-1--1--1,,1|(845,273)|
+1,117,111,60,0,0,0,0,0,64,1,-1--1--1,,1|(920,294)|
+1,118,109,71,0,0,0,0,0,64,1,-1--1--1,,1|(754,296)|
+1,119,111,71,0,0,0,0,0,64,1,-1--1--1,,1|(834,318)|
+12,120,0,1120,313,4,8,8,7,0,0,-1,0,0,0
+ 
+1,121,14,120,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(1114,277)|
+12,122,0,977,393,5,8,8,7,0,0,-1,0,0,0
+  
+1,123,29,122,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(1065,495)|
+12,124,0,818,358,5,8,8,7,0,0,-1,0,0,0
+  
+1,125,29,124,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(919,544)|
+12,126,0,932,32,45,9,8,135,0,60,-1,0,2,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 1
+12,127,0,1186,32,37,9,8,135,0,60,-1,0,5,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Workforce
+12,128,0,842,32,43,9,8,135,0,60,-1,0,1,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Introduction
+12,129,0,1109,32,37,9,8,135,0,60,-1,0,4,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Full Model
+12,130,0,1025,32,45,9,8,135,0,60,-1,0,3,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 2
+12,131,0,1013,2,191,8,8,135,0,56,-1,0,0,0,-1--1--1,0-0-0,Arial|14|B|0-0-0
+Navigate among the model sectors using these buttons:
+12,132,0,839,55,27,8,8,7,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+This view
+12,133,0,929,74,39,27,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+Simple dashboard with full controls
+12,134,0,1023,74,41,27,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+More complex dashboard with full controls
+12,135,0,1109,69,28,25,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+Full model structure
+12,136,0,1186,69,35,23,8,135,0,32,-1,0,0,0,-1--1--1,0-0-0,Arial|12||0-0-0
+Workforce and Labor Controls
+12,137,0,378,581,372,15,8,135,0,0,-1,0,0,0
+Repenning, N., and J. Sterman. 2002. Capability traps and self-confirming attribution errors in the dynamics of process improvement. Administrative Science Quarterly 47(2): 265–295. doi:10.2307/3094806.  http://jsterman.scripts.mit.edu/Online_Publications.html#2002Capability. 
+12,138,0,376,546,363,14,8,135,0,0,-1,0,0,0
+Lyneis, J. and J. Sterman 2016. How to Save a Leaky Ship: Capability Traps and the Failure of Win-Win Investments in Sustainability and Social Responsibility. Academy of Management Discoveries.  http://jsterman.scripts.mit.edu/Online_Publications.html#HowToSave. 
+12,139,0,362,693,341,10,8,132,0,0,0,0,0,0
+Sterman, J. 2000. Business dynamics: Systems thinking and modeling for a complex world. Chicago, IL: Irwin/McGraw-Hill.
+12,140,0,373,617,344,16,8,135,0,0,-1,0,0,0
+Repenning, N., and J. Sterman. 2001. Nobody Ever Gets Credit for Fixing Problems that Never Happened. California Management Review 43(4): 64-88. doi:10.2307/41166101.  http://jsterman.scripts.mit.edu/Online_Publications.html#2001Nobody
+12,141,0,375,658,363,23,8,135,0,0,-1,0,0,0
+Sterman, J. 2015. Stumbling towards Sustainability: Why organizational learning and radical innovation are necessary to build a more sustainable world—but not sufficient. R. Henderson, M. Tushman and R. Gulati (eds.) Organizational & Strategic Change and the Challenge of Sustainability. New York: Oxford University Press, 51-80.  http://jsterman.scripts.mit.edu/Online_Publications.html#StumblingTowards.
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Dashboard 1
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|72,72,100,0
+10,1,Standard Workweek,73,754,59,8,8,131,0,48,0,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,2,Initial Capabilities,71,685,53,8,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,3,Maximum Capabilities,117,64,46,16,8,2,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+10,4,Reference Fraction of Effort to Output,485,653,112,10,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+12,5,25488912,1602,1140,181,112,3,188,0,48,1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Shortfall
+12,6,25489212,789,663,181,112,3,188,0,48,1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Output
+12,7,25489400,788,432,181,112,3,188,0,48,1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Capabilities
+10,8,Step in Required Output,654,410,62,16,8,2,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+10,9,Initial Required Output,640,315,58,16,8,2,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+10,10,Initial Labor,76,719,36,8,8,3,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+12,11,25489404,789,203,181,112,3,188,0,48,1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Work_Week
+12,12,25489408,1157,202,181,112,3,188,0,48,1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Effort_Allocation
+12,13,25489412,1157,663,181,112,3,188,0,48,1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Capability_Improvement_and_Loss
+10,14,Maximum Workweek,258,754,65,8,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,15,Average Capability Loss Rate,486,685,93,9,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,16,Initial Required Output,75,588,70,10,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,17,Sensitivity of Improvement Effort to Output,481,621,129,9,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,18,Sensitivity of Work Effort to Output,477,589,102,10,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,19,Step in Required Output,76,621,75,8,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,20,Capability Delay Order,402,869,36,14,8,131,1,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,21,Ramp in Required Output,79,653,79,9,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,22,Fractional Change in Labor,254,621,80,9,8,131,0,48,-1,0,0,0,-1--1--1,0-0-0,Arial|12|B|0-0-0
+10,23,Ramp in Labor,254,654,44,8,8,131,0,48,-1,0,0,0,-1--1--1,0-0-0,Arial|12|B|0-0-0
+10,24,Maximum Capabilities,476,717,68,8,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+12,25,25489416,1157,433,181,112,3,188,0,48,1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Labor_Force
+10,26,Increase in Time Spent Working,258,589,93,11,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,27,TIME STEP,22,581,41,8,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+10,28,Increase in Time Spent Improving,-94,541,54,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+10,29,Sensitivity of Labor to Output Shortfall,255,684,114,8,8,131,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+10,30,Sensitivity of Labor to Capabilities,259,719,106,7,8,131,0,48,-1,0,0,0,-1--1--1,0-0-0,Arial|12|B|0-0-0
+10,31,Capabilities,266,143,47,25,3,131,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+12,32,48,85,144,10,8,0,3,0,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,33,35,31,4,0,0,22,0,0,0,-1--1--1,,1|(188,144)|
+1,34,35,32,100,0,0,22,2,0,0,-1--1--1,|12||0-0-0,1|(120,144)|
+11,35,48,151,144,6,8,34,3,0,0,1,0,0,0
+10,36,Capability Increase,151,168,47,16,40,131,0,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+12,37,48,472,144,10,8,0,3,0,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,38,40,37,4,0,0,22,0,0,0,-1--1--1,,1|(426,142)|
+1,39,40,31,100,0,0,22,0,0,0,-1--1--1,,1|(346,142)|
+11,40,48,385,142,6,8,34,3,0,0,1,0,0,0
+10,41,Capability Decrease,385,166,36,16,40,131,0,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,42,31,40,1,0,0,0,0,64,1,-1--1--1,,1|(304,94)|
+10,43,Average Capability Loss Rate,391,95,55,24,8,2,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,44,43,40,1,1,0,0,0,64,0,-1--1--1,,1|(379,120)|
+10,45,Required Output,542,341,50,16,8,131,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,46,Output Shortfall,477,411,56,9,8,3,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,47,Output,392,293,28,13,8,131,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,48,Time Spent Improving,105,325,41,20,8,131,0,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,49,47,46,1,0,45,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(480,363)|
+1,50,45,46,1,0,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(535,376)|
+1,51,48,36,1,0,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(125,198)|
+10,52,Productivity of Improvement Effort,3,181,68,16,8,3,1,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,53,52,36,1,1,43,13,32,64,0,-1--1--1,Arial|12||0-0-0,1|(78,176)|
+1,54,31,36,1,1,0,0,0,64,0,-1--1--1,,1|(230,195)|
+1,55,35,40,1,1,0,0,0,64,0,-1--1--1,,1|(229,94)|
+1,56,31,63,1,1,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(375,203)|
+10,57,Labor,480,244,30,9,8,2,1,59,-1,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,58,57,47,1,1,43,13,32,64,0,-1--1--1,Arial|12||0-0-0,1|(441,271)|
+1,59,72,47,1,0,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(336,290)|
+10,60,Maximum Workweek,104,282,41,16,8,2,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,61,60,48,1,1,43,13,34,64,0,-1--1--1,Arial|12||0-0-0,1|(159,327)|
+1,62,72,48,1,0,45,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(175,363)|
+10,63,Productivity,381,211,43,9,8,3,1,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,64,Reference Productivity,465,172,43,16,8,3,1,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,65,64,63,1,1,43,0,32,64,0,-1--1--1,Arial|12||0-0-0,1|(438,196)|
+1,66,63,47,1,1,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(395,253)|
+10,67,Labor,34,137,30,9,8,2,1,59,-1,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,68,67,36,1,1,43,13,34,128,0,-1--1--1,Arial|12||0-0-0,1|(78,147)|
+1,69,43,52,1,0,0,0,0,64,1,-1--1--1,,1|(-69,119)|
+10,70,Maximum Workweek,378,482,41,16,8,2,1,59,-1,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,71,70,77,1,1,0,0,0,64,0,-1--1--1,,1|(353,464)|
+10,72,Time Spent Working,261,356,40,16,8,3,0,56,0,0,0,0,-1--1--1,0-0-0,Arial|14|B|0-0-0
+12,73,48,260,472,10,8,0,3,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,74,76,72,4,1,0,22,0,0,0,-1--1--1,,1|(269,396)|
+1,75,76,73,100,1,0,22,0,0,0,-1--1--1,,1|(269,448)|
+11,76,48,269,426,8,6,33,3,1,0,4,0,0,0
+10,77,Change in Time Spent Working,332,426,55,16,40,131,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,78,Sensitivity of Work Effort to Output,335,516,50,24,8,130,1,59,0,0,0,0,128-128-128,0-0-0,Arial|14|B|128-128-128
+1,79,78,77,0,1,0,0,0,64,0,-1--1--1,,1|(333,473)|
+1,80,46,77,1,1,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(396,462)|
+1,81,72,76,1,1,0,0,0,64,0,-1--1--1,,1|(243,380)|
+1,82,60,88,1,1,0,0,0,64,0,-1--1--1,,1|(115,376)|
+10,83,Required Improvement Effort,70,413,49,23,3,131,1,56,0,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+12,84,48,70,525,10,8,0,3,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+1,85,87,83,4,1,0,22,0,0,0,-1--1--1,,1|(70,455)|
+1,86,87,84,100,1,0,22,0,0,0,-1--1--1,,1|(70,502)|
+11,87,48,70,481,8,6,33,3,1,0,2,0,0,0
+10,88,Change in Required Improvement Effort,-8,481,70,16,40,131,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+10,89,Sensitivity of Improvement Effort to Output,51,408,58,21,8,2,1,3,0,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,90,89,88,1,1,0,0,0,64,0,-1--1--1,,1|(81,466)|
+1,91,46,87,1,1,43,13,34,128,0,-1--1--1,Arial|12||0-0-0,1|(101,503)|
+1,92,48,87,1,1,0,0,0,64,0,-1--1--1,,1|(44,402)|
+1,93,83,48,1,1,43,13,34,192,0,-1--1--1,Arial|12||0-0-0,1|(87,339)|
+12,94,48,260,472,10,8,0,3,1,56,-1,0,0,0,0-0-0,0-0-0,Arial|14|B|0-0-0
+12,95,0,225,229,20,20,4,7,0,51,-1,0,0,0,255-0-0,0-0-0,Arial|12|B|255-0-0
+R1
+12,96,0,225,268,42,14,8,135,0,51,-1,0,0,0,255-0-0,0-0-0,Arial|12|B|255-0-0
+Reinvestment or Ruin
+12,97,0,369,366,20,20,4,7,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+B1
+12,98,0,371,405,42,15,8,135,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Working Harder
+12,99,0,204,428,20,20,4,7,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+B2
+12,100,0,205,468,38,14,8,135,0,48,-1,0,0,0,0-0-0,0-0-0,Arial|12|B|0-0-0
+Working Smarter
+10,101,Ramp in Required Output,519,275,54,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,102,101,45,0,1,0,0,0,64,0,-1--1--1,,1|(527,300)|
+10,103,TIME STEP,346,489,41,8,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,104,103,77,0,1,0,0,0,64,0,-1--1--1,,1|(341,468)|
+1,105,106,88,0,1,0,0,0,64,0,-1--1--1,,1|(18,519)|
+10,106,Increase in Time Spent Improving,35,544,47,14,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,107,Increase in Time Spent Working,298,513,54,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,108,107,77,0,1,0,0,0,64,0,-1--1--1,,1|(311,477)|
+10,109,Initial Capabilities,266,182,40,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,110,109,31,0,0,0,0,0,64,1,-1--1--1,,1|(266,175)|
+10,111,Maximum Capabilities,170,180,40,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,112,111,36,0,1,0,0,0,64,0,-1--1--1,,1|(167,179)|
+10,113,Capability Delay Order,364,181,40,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,114,113,41,0,0,0,0,0,64,1,-1--1--1,,1|(366,179)|
+1,115,109,52,0,0,0,0,0,64,1,-1--1--1,,1|(155,182)|
+1,116,111,52,0,0,0,0,0,64,1,-1--1--1,,1|(107,181)|
+10,117,Reference Fraction of Effort to Output,3,195,61,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,118,117,52,0,0,0,0,0,64,1,-1--1--1,,1|(3,195)|
+10,119,Standard Workweek,150,198,35,14,8,2,1,51,-1,0,0,0,128-128-128,0-0-0,Arial|12|B|128-128-128
+1,120,119,52,0,0,0,0,0,64,1,-1--1--1,,1|(99,193)|
+1,121,117,64,0,0,0,0,0,64,1,-1--1--1,,1|(236,184)|
+1,122,119,64,0,0,0,0,0,64,1,-1--1--1,,1|(296,187)|
+1,123,117,72,0,0,0,0,0,64,1,-1--1--1,,1|(124,270)|
+1,124,119,72,0,0,0,0,0,64,1,-1--1--1,,1|(199,270)|
+1,125,117,83,0,0,0,0,0,64,1,-1--1--1,,1|(32,292)|
+1,126,119,83,0,0,0,0,0,64,1,-1--1--1,,1|(113,294)|
+12,127,0,399,289,4,8,8,7,0,0,-1,0,0,0
+ 
+1,128,31,127,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(393,253)|
+12,129,0,256,369,5,8,8,7,0,0,-1,0,0,0
+  
+1,130,46,129,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(344,471)|
+12,131,0,97,334,5,8,8,7,0,0,-1,0,0,0
+  
+1,132,46,131,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(198,520)|
+1,133,16,45,0,1,0,0,0,64,0,-1--1--1,,1|(295,470)|
+1,134,19,45,0,1,0,0,0,64,0,-1--1--1,,1|(296,488)|
+1,135,10,52,0,0,0,0,0,64,1,-1--1--1,,1|(40,460)|
+1,136,10,64,0,0,0,0,0,64,1,-1--1--1,,1|(262,455)|
+1,137,16,64,0,0,0,0,0,64,1,-1--1--1,,1|(262,388)|
+10,138,TIME STEP,-8,511,39,8,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,139,138,88,0,1,0,0,0,64,0,-1--1--1,,1|(-8,507)|
+12,140,0,204,99,45,9,8,135,0,60,-1,0,2,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 1
+12,141,0,458,99,37,9,8,135,0,60,-1,0,5,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Workforce
+12,142,0,114,99,43,9,8,135,0,60,-1,0,1,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Introduction
+12,143,0,381,99,37,9,8,135,0,60,-1,0,4,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Full Model
+12,144,0,297,99,45,9,8,135,0,60,-1,0,3,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 2
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Dashboard 2
+$192-192-192,0,Arial|12|B|0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|72,72,100,0
+10,1,Capabilities,365,66,47,25,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,2,48,220,65,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,3,5,1,4,0,0,22,0,0,0,-1--1--1,,1|(296,65)|
+1,4,5,2,100,0,0,22,2,0,0,-1--1--1,|12||0-0-0,1|(246,65)|
+11,5,48,269,65,6,8,34,3,0,0,1,0,0,0
+10,6,Capability Increase,269,89,36,16,40,131,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,7,48,523,67,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,8,10,7,4,0,0,22,0,0,0,-1--1--1,,1|(491,66)|
+1,9,10,1,100,0,0,22,0,0,0,-1--1--1,,1|(434,66)|
+11,10,48,463,66,6,8,34,3,0,0,1,0,0,0
+10,11,Capability Decrease,463,90,49,16,40,131,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,12,1,10,1,0,0,0,0,64,1,-1--1--1,,1|(403,17)|
+10,13,Average Capability Loss Rate,450,18,55,24,8,2,1,11,0,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,14,13,10,1,1,0,0,0,64,0,-1--1--1,,1|(438,43)|
+10,15,Required Output,625,289,49,16,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,16,Output Shortfall,570,369,56,9,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,17,Output,498,233,32,12,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,18,Time Spent Improving,179,239,40,16,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,19,17,16,1,0,45,13,2,192,0,-1--1--1,|12||0-0-0,1|(572,326)|
+1,20,15,16,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(620,330)|
+1,21,18,6,1,0,43,13,0,64,0,-1--1--1,,1|(220,121)|
+10,22,Productivity of Improvement Effort,119,138,60,25,8,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,23,22,6,1,0,43,13,0,64,0,-1--1--1,,1|(198,104)|
+10,24,Standard Workweek,130,695,67,6,8,131,0,0,0,0,0,0
+10,25,Initial Capabilities,122,630,61,7,8,131,0,0,-1,0,0,0
+1,26,25,1,0,0,0,0,0,64,1,-1--1--1,,1|(236,363)|
+10,27,Maximum Capabilities,181,0,46,16,8,2,1,11,0,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,28,1,6,1,1,0,0,0,64,0,-1--1--1,,1|(336,107)|
+1,29,27,5,1,1,0,13,0,64,0,-1--1--1,,1|(187,31)|
+1,30,5,10,1,1,0,0,0,64,0,-1--1--1,,1|(328,17)|
+10,31,Reference Fraction of Effort to Output,534,591,119,7,8,131,0,0,-1,0,0,0
+12,32,36933828,1666,1076,181,112,3,188,0,0,1,0,0,0
+Shortfall
+12,33,36934600,853,599,181,112,3,188,0,0,1,0,0,0
+Output
+12,34,36934604,852,368,181,112,3,188,0,0,1,0,0,0
+Capabilities
+10,35,Step in Required Output,718,346,62,16,8,2,1,11,0,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,36,35,15,1,1,0,13,0,64,0,-1--1--1,,1|(722,298)|
+10,37,Initial Required Output,704,251,58,16,8,2,1,11,0,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,38,37,15,1,1,0,13,0,64,0,-1--1--1,,1|(652,272)|
+1,39,1,46,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(474,148)|
+10,40,Labor,579,189,30,9,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,41,40,17,1,0,43,13,0,64,0,-1--1--1,,1|(540,216)|
+1,42,65,17,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(390,259)|
+10,43,Maximum Workweek,97,279,41,16,8,2,0,11,0,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,44,43,18,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(114,248)|
+1,45,65,18,1,0,45,13,2,192,0,-1--1--1,|12||0-0-0,1|(265,315)|
+10,46,Productivity,480,156,43,9,8,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,47,Reference Productivity,564,95,43,16,8,3,1,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,48,47,46,1,1,43,0,0,64,0,-1--1--1,,1|(537,119)|
+1,49,46,17,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(494,198)|
+10,50,Labor,133,82,30,9,8,2,0,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,51,50,6,1,0,43,13,2,128,0,-1--1--1,|12||0-0-0,1|(197,79)|
+1,52,13,22,1,0,0,0,0,64,1,-1--1--1,,1|(58,78)|
+10,53,Initial Labor,126,661,36,8,8,3,0,0,-1,0,0,0
+1,54,53,22,1,0,0,0,0,64,1,-1--1--1,,1|(-134,575)|
+1,55,25,22,1,0,0,0,0,64,1,-1--1--1,,1|(327,225)|
+1,56,24,22,1,0,0,0,0,64,1,-1--1--1,,1|(110,124)|
+1,57,31,22,1,0,0,0,0,64,1,-1--1--1,,1|(102,138)|
+1,58,37,47,0,0,0,13,0,64,1,-1--1--1,,1|(640,180)|
+1,59,53,47,0,0,0,0,0,64,1,-1--1--1,,1|(337,387)|
+1,60,24,47,0,0,0,0,0,64,1,-1--1--1,,1|(338,405)|
+1,61,31,47,0,0,0,0,0,64,1,-1--1--1,,1|(548,354)|
+1,62,27,22,1,0,0,13,0,64,1,-1--1--1,,1|(88,31)|
+10,63,Maximum Workweek,487,426,41,16,8,2,1,11,-1,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,64,63,70,1,1,0,0,0,64,0,-1--1--1,,1|(462,408)|
+10,65,Time Spent Working,370,300,40,20,3,3,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,66,48,369,416,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,67,69,65,4,0,0,22,0,0,0,-1--1--1,,1|(368,342)|
+1,68,69,66,100,0,0,22,0,0,0,-1--1--1,,1|(368,392)|
+11,69,48,368,370,8,6,33,3,0,0,4,0,0,0
+10,70,Change in Time Spent Working,433,370,57,21,40,131,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,71,Sensitivity of Work Effort to Output,444,460,50,24,8,130,1,11,0,0,0,0,128-128-128,0-0-0,|14||128-128-128
+1,72,71,70,0,1,0,0,0,64,0,-1--1--1,,1|(439,420)|
+1,73,16,70,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(501,397)|
+1,74,31,65,0,0,0,0,0,64,1,-1--1--1,,1|(459,458)|
+1,75,24,65,0,0,0,0,0,64,1,-1--1--1,,1|(241,510)|
+1,76,65,69,1,1,0,0,0,64,0,-1--1--1,,1|(176,509)|
+1,77,43,83,1,1,0,0,0,64,0,-1--1--1,,1|(97,410)|
+10,78,Required Improvement Effort,179,357,49,23,3,131,0,8,0,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,79,48,179,469,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+1,80,82,78,4,0,0,22,0,0,0,-1--1--1,,1|(179,399)|
+1,81,82,79,100,0,0,22,0,0,0,-1--1--1,,1|(179,446)|
+11,82,48,179,425,8,6,33,3,0,0,2,0,0,0
+10,83,Change in Required Improvement Effort,107,425,64,36,40,131,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+10,84,Sensitivity of Improvement Effort to Output,3,350,66,21,8,2,1,3,0,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,85,84,83,1,1,0,0,0,64,0,-1--1--1,,1|(34,407)|
+1,86,16,82,1,0,43,13,2,128,0,-1--1--1,|12||0-0-0,1|(212,451)|
+1,87,31,78,0,0,0,0,0,64,1,-1--1--1,,1|(374,485)|
+1,88,24,78,0,0,0,0,0,64,1,-1--1--1,,1|(151,541)|
+1,89,18,82,1,1,0,0,0,64,0,-1--1--1,,1|(113,339)|
+1,90,78,18,1,0,43,13,2,192,0,-1--1--1,|12||0-0-0,1|(165,266)|
+12,91,48,369,416,10,8,0,3,0,8,-1,0,0,0,0-0-0,0-0-0,|14||0-0-0
+12,92,36934608,853,139,181,112,3,188,0,0,1,0,0,0
+Work_Week
+12,93,36934612,1221,138,181,112,3,188,0,0,1,0,0,0
+Effort_Allocation
+12,94,36934616,1221,599,181,112,3,188,0,0,1,0,0,0
+Capability_Improvement_and_Loss
+12,95,0,336,165,20,20,4,7,0,3,-1,0,0,0,255-0-0,0-0-0,|12||255-0-0
+R1
+12,96,0,336,204,42,14,8,135,0,3,-1,0,0,0,255-0-0,0-0-0,|12||255-0-0
+Reinvestment or Ruin
+12,97,0,481,291,20,20,4,7,0,0,-1,0,0,0
+B1
+12,98,0,481,324,47,8,8,135,0,0,-1,0,0,0
+Working Harder
+12,99,0,289,389,20,20,4,7,0,0,-1,0,0,0
+B2
+12,100,0,288,425,50,8,8,135,0,0,-1,0,0,0
+Working Smarter
+10,101,Maximum Workweek,318,692,68,6,8,131,0,0,-1,0,0,0
+10,102,Average Capability Loss Rate,532,625,101,7,8,131,0,0,-1,0,0,0
+10,103,Initial Required Output,126,521,76,7,8,131,0,0,-1,0,0,0
+10,104,Sensitivity of Improvement Effort to Output,530,558,134,8,8,131,0,0,-1,0,0,0
+10,105,Sensitivity of Work Effort to Output,528,518,108,8,8,131,0,0,-1,0,0,0
+10,106,Step in Required Output,126,556,83,7,8,131,0,0,-1,0,0,0
+10,107,Capability Delay Order,466,805,76,13,8,131,1,0,-1,0,0,0
+1,108,107,11,0,1,0,0,0,64,1,-1--1--1,,1|(464,455)|
+10,109,Ramp in Required Output,125,593,87,7,8,131,0,0,-1,0,0,0
+10,110,Fractional Change in Labor,316,559,93,7,8,131,0,0,-1,0,0,0
+10,111,Ramp in Labor,321,596,56,8,8,131,0,0,-1,0,0,0
+10,112,Ramp in Required Output,618,220,54,14,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,113,112,15,0,1,0,0,0,64,0,-1--1--1,,1|(620,246)|
+10,114,Maximum Capabilities,527,661,81,8,8,131,0,0,-1,0,0,0
+12,115,36934620,1221,369,181,112,3,188,0,0,1,0,0,0
+Labor_Force
+10,116,Increase in Time Spent Working,311,518,107,6,8,131,0,0,-1,0,0,0
+10,117,TIME STEP,455,433,41,8,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,118,117,70,0,1,0,0,0,64,0,-1--1--1,,1|(448,414)|
+1,119,122,83,0,1,0,0,0,64,0,-1--1--1,,1|(15,465)|
+10,120,TIME STEP,97,510,41,8,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,121,120,83,0,1,0,0,0,64,0,-1--1--1,,1|(98,488)|
+10,122,Increase in Time Spent Improving,-30,487,54,14,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,123,Increase in Time Spent Working,392,459,54,14,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,124,123,70,0,1,0,0,0,64,0,-1--1--1,,1|(407,424)|
+10,125,Sensitivity of Labor to Output Shortfall,318,626,117,5,8,131,0,0,-1,0,0,0
+10,126,Sensitivity of Labor to Capabilities,320,661,110,6,8,131,0,0,-1,0,0,0
+12,127,0,283,22,45,9,8,135,0,60,-1,0,2,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 1
+12,128,0,537,22,37,9,8,135,0,60,-1,0,5,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Workforce
+12,129,0,193,22,43,9,8,135,0,60,-1,0,1,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Introduction
+12,130,0,460,22,37,9,8,135,0,60,-1,0,4,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Full Model
+12,131,0,376,22,45,9,8,135,0,60,-1,0,3,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 2
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Full Model
+$192-192-192,0,Arial|12|B|0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|72,72,100,0
+10,1,Capabilities,396,118,40,20,3,3,0,0,0,0,0,0
+12,2,48,262,114,10,8,0,3,0,0,-1,0,0,0
+1,3,5,1,4,0,0,22,0,0,0,-1--1--1,,1|(338,114)|
+1,4,5,2,100,0,0,22,0,0,0,-1--1--1,,1|(290,114)|
+11,5,48,314,114,6,8,34,3,0,0,1,0,0,0
+10,6,Capability Increase,314,141,38,19,40,131,0,0,-1,0,0,0
+12,7,48,539,116,10,8,0,3,0,0,-1,0,0,0
+1,8,10,7,4,0,0,22,0,0,0,-1--1--1,,1|(508,116)|
+1,9,10,1,100,0,0,22,0,0,0,-1--1--1,,1|(456,116)|
+11,10,48,482,116,6,8,34,3,0,0,1,0,0,0
+10,11,Capability Decrease,482,139,50,15,40,131,0,0,-1,0,0,0
+1,12,1,10,1,0,0,0,0,64,1,-1--1--1,,1|(435,74)|
+10,13,Average Capability Loss Rate,525,67,47,21,8,3,0,0,0,0,0,0
+1,14,13,10,1,0,0,0,0,64,0,-1--1--1,,1|(513,92)|
+10,15,Required Output,701,355,50,8,8,3,0,0,0,0,0,0
+10,16,Output Shortfall,605,418,48,8,8,3,0,0,0,0,0,0
+10,17,Output,527,288,22,8,8,3,0,0,0,0,0,0
+10,18,Time Spent Improving,162,319,34,14,8,3,0,0,0,0,0,0
+1,19,17,16,1,0,0,0,0,64,0,-1--1--1,,1|(605,378)|
+1,20,15,16,1,0,0,0,0,64,0,-1--1--1,,1|(649,388)|
+1,21,18,6,1,0,0,0,0,64,0,-1--1--1,,1|(231,163)|
+10,22,Productivity of Improvement Effort,135,144,59,14,8,3,0,0,0,0,0,0
+1,23,22,6,1,0,0,0,0,64,0,-1--1--1,,1|(228,142)|
+10,24,Standard Workweek,568,905,59,8,8,3,0,0,0,0,0,0
+10,25,Initial Capabilities,569,960,53,8,8,3,0,0,-1,0,0,0
+1,26,25,1,0,0,0,0,0,64,1,-1--1--1,,1|(485,551)|
+10,27,Maximum Capabilities,278,58,36,14,8,3,0,0,0,0,0,0
+1,28,1,6,1,0,0,0,0,64,0,-1--1--1,,1|(373,156)|
+1,29,27,5,1,0,0,0,0,64,0,-1--1--1,,1|(284,79)|
+1,30,5,10,1,0,0,0,0,64,0,-1--1--1,,1|(363,66)|
+10,31,Capability Delay Order,569,1019,36,14,8,3,0,0,-1,0,0,0
+1,32,31,11,0,0,0,0,0,64,1,-1--1--1,,1|(526,586)|
+10,33,Reference Fraction of Effort to Output,424,961,58,14,8,3,0,0,-1,0,0,0
+12,34,0,961,350,181,112,3,188,0,0,1,0,0,0
+Shortfall
+12,35,0,962,125,181,112,3,188,0,0,1,0,0,0
+Output
+12,36,0,961,577,181,112,3,188,0,0,1,0,0,0
+Capabilities
+10,37,Step in Required Output,714,404,50,14,8,3,0,0,0,0,0,0
+1,38,37,15,1,0,0,0,0,64,0,-1--1--1,,1|(719,374)|
+10,39,Initial Required Output,722,308,46,14,8,3,0,0,0,0,0,0
+1,40,39,15,1,0,0,0,0,64,0,-1--1--1,,1|(718,330)|
+1,41,1,48,1,0,0,0,0,64,0,-1--1--1,,1|(486,187)|
+10,42,Labor,609,247,26,8,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,43,42,17,1,0,0,0,0,64,0,-1--1--1,,1|(573,274)|
+1,44,72,17,1,0,0,0,0,64,0,-1--1--1,,1|(485,289)|
+10,45,Maximum Workweek,49,296,32,14,8,3,0,0,0,0,0,0
+1,46,45,18,1,0,0,0,0,64,0,-1--1--1,,1|(79,310)|
+1,47,72,18,1,0,0,0,0,64,0,-1--1--1,,1|(276,382)|
+10,48,Productivity,490,191,37,8,8,3,0,0,0,0,0,0
+10,49,Reference Productivity,599,144,37,14,8,3,0,0,0,0,0,0
+1,50,49,48,1,0,0,0,0,64,0,-1--1--1,,1|(563,165)|
+1,51,48,17,1,0,0,0,0,64,0,-1--1--1,,1|(524,242)|
+10,52,Labor,197,85,26,8,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,53,52,6,1,0,0,0,0,64,0,-1--1--1,,1|(213,105)|
+1,54,13,22,1,0,0,0,0,64,1,-1--1--1,,1|(69,79)|
+10,55,Initial Labor,424,1026,43,8,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,56,55,22,1,0,0,0,0,64,1,-1--1--1,,1|(1304,403)|
+1,57,25,22,1,0,0,0,0,64,1,-1--1--1,,1|(795,-3)|
+1,58,24,22,1,0,0,0,0,64,1,-1--1--1,,1|(88,187)|
+1,59,33,22,1,0,0,0,0,64,1,-1--1--1,,1|(76,163)|
+1,60,39,49,0,0,0,0,0,64,1,-1--1--1,,1|(664,231)|
+1,61,55,49,0,0,0,0,0,64,1,-1--1--1,,1|(509,594)|
+1,62,24,49,0,0,0,0,0,64,1,-1--1--1,,1|(582,534)|
+1,63,33,49,0,0,0,0,0,64,1,-1--1--1,,1|(509,559)|
+1,64,27,22,1,0,0,0,0,64,1,-1--1--1,,1|(185,51)|
+10,65,Work Week,214,950,34,8,8,3,0,0,0,0,0,0
+10,66,Time Spent Improving,108,990,38,14,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,67,Time Spent Working,108,912,38,14,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,68,67,65,0,0,0,0,0,64,0,-1--1--1,,1|(161,931)|
+1,69,66,65,0,0,0,0,0,64,0,-1--1--1,,1|(161,969)|
+10,70,Maximum Workweek,390,497,35,14,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,71,70,77,1,0,0,0,0,64,0,-1--1--1,,1|(434,474)|
+10,72,Time Spent Working,405,349,40,20,3,3,0,0,0,0,0,0
+12,73,48,404,465,10,8,0,3,0,0,-1,0,0,0
+1,74,76,72,4,0,0,22,0,0,0,-1--1--1,,1|(405,396)|
+1,75,76,73,100,0,0,22,0,0,0,-1--1--1,,1|(405,446)|
+11,76,48,405,430,8,6,33,3,0,0,4,0,0,0
+10,77,Change in Time Spent Working,460,430,47,14,40,3,0,0,-1,0,0,0
+10,78,Sensitivity of Work Effort to Output,499,508,46,21,8,131,0,0,0,0,0,0
+1,79,78,77,0,0,0,0,0,64,0,-1--1--1,,1|(481,471)|
+1,80,16,77,1,0,0,0,0,64,0,-1--1--1,,1|(549,459)|
+1,81,33,72,0,0,0,0,0,64,1,-1--1--1,,1|(414,665)|
+1,82,24,72,0,0,0,0,0,64,1,-1--1--1,,1|(489,639)|
+1,83,72,76,1,0,0,0,0,64,0,-1--1--1,,1|(387,373)|
+10,84,Maximum Workweek,143,649,35,14,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,85,84,91,1,0,0,0,0,64,0,-1--1--1,,1|(222,604)|
+10,86,Required Improvement Effort,171,494,40,20,3,3,0,0,0,0,0,0
+12,87,48,170,610,10,8,0,3,0,0,-1,0,0,0
+1,88,90,86,4,0,0,22,0,0,0,-1--1--1,,1|(171,536)|
+1,89,90,87,100,0,0,22,0,0,0,-1--1--1,,1|(171,586)|
+11,90,48,171,565,8,6,33,3,0,0,4,0,0,0
+10,91,Change in Required Improvement Effort,227,565,48,25,40,131,0,0,-1,0,0,0
+10,92,Sensitivity of Improvement Effort to Output,268,659,59,21,8,3,0,0,0,0,0,0
+1,93,92,91,1,0,0,0,0,64,0,-1--1--1,,1|(242,592)|
+1,94,16,91,1,0,0,0,0,64,0,-1--1--1,,1|(319,623)|
+1,95,33,86,0,0,0,0,0,64,1,-1--1--1,,1|(302,736)|
+1,96,24,86,0,0,0,0,0,64,1,-1--1--1,,1|(380,710)|
+1,97,18,90,1,0,0,0,0,64,0,-1--1--1,,1|(102,441)|
+1,98,86,18,1,0,0,0,0,64,0,-1--1--1,,1|(148,358)|
+10,99,Fraction of Time Spent Working,216,864,49,14,8,3,0,0,0,0,0,0
+10,100,Fraction of Time Spent Improving,215,1032,50,14,8,3,0,0,0,0,0,0
+1,101,67,99,0,0,0,0,0,64,0,-1--1--1,,1|(155,890)|
+1,102,65,99,0,0,0,0,0,64,0,-1--1--1,,1|(214,916)|
+1,103,66,100,0,0,0,0,0,64,0,-1--1--1,,1|(154,1008)|
+1,104,65,100,0,0,0,0,0,64,0,-1--1--1,,1|(214,981)|
+12,105,48,406,466,10,8,0,3,0,0,-1,0,0,0
+12,106,0,1330,124,181,112,3,188,0,0,1,0,0,0
+Work_Week
+12,107,0,1330,351,181,112,3,188,0,0,1,0,0,0
+Effort_Allocation
+12,108,0,1329,577,181,112,3,188,0,0,1,0,0,0
+Capability_Improvement_and_Loss
+12,109,0,326,259,20,20,4,7,0,0,-1,0,0,0
+R
+12,110,0,326,298,38,13,8,135,0,8,-1,0,0,0,-1--1--1,0-0-0,|10||0-0-0
+Reinvestment or Ruin
+12,111,0,516,352,20,20,4,7,0,0,-1,0,0,0
+B1
+12,112,0,516,388,32,11,8,135,0,8,-1,0,0,0,-1--1--1,0-0-0,|10||0-0-0
+Working Harder
+12,113,0,299,468,20,20,4,7,0,0,-1,0,0,0
+B2
+12,114,0,298,507,36,14,8,135,0,8,-1,0,0,0,-1--1--1,0-0-0,|10||0-0-0
+Working Smarter
+10,115,Ramp in Required Output,703,253,50,14,8,3,0,0,-1,0,0,0
+1,116,115,15,1,0,0,0,0,64,0,-1--1--1,,1|(666,301)|
+10,117,Increase in Time Spent Working,432,546,50,14,8,3,0,0,-1,0,0,0
+1,118,117,77,1,0,0,0,0,64,0,-1--1--1,,1|(446,518)|
+10,119,TIME STEP,546,473,41,8,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,120,119,77,1,0,0,0,0,64,0,-1--1--1,,1|(505,468)|
+10,121,Increase in Time Spent Improving,355,589,50,14,8,3,0,0,0,0,0,0
+1,122,117,121,0,0,0,0,0,64,0,-1--1--1,,1|(399,564)|
+1,123,121,91,1,0,0,0,0,64,0,-1--1--1,,1|(286,598)|
+10,124,TIME STEP,95,600,41,8,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,125,124,90,0,0,0,0,0,64,0,-1--1--1,,1|(131,582)|
+12,126,0,305,20,45,9,8,135,0,60,-1,0,2,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 1
+12,127,0,559,20,37,9,8,135,0,60,-1,0,5,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Workforce
+12,128,0,215,20,43,9,8,135,0,60,-1,0,1,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Introduction
+12,129,0,482,20,37,9,8,135,0,60,-1,0,4,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Full Model
+12,130,0,398,20,45,9,8,135,0,60,-1,0,3,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 2
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*Workforce
+$192-192-192,0,Arial|12|B|0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|72,72,150,0
+10,1,Labor,396,320,40,20,3,3,0,0,0,0,0,0
+12,2,48,257,316,10,8,0,3,0,0,-1,0,0,0
+1,3,5,1,4,0,0,22,0,0,0,-1--1--1,,1|(336,316)|
+1,4,5,2,100,0,0,22,0,0,0,-1--1--1,,1|(286,316)|
+11,5,48,311,316,6,8,34,3,0,0,1,0,0,0
+10,6,Hiring,311,332,20,8,40,3,0,0,-1,0,0,0
+12,7,48,558,321,10,8,0,3,0,0,-1,0,0,0
+1,8,10,7,4,0,0,22,0,0,0,-1--1--1,,1|(523,321)|
+1,9,10,1,100,0,0,22,0,0,0,-1--1--1,,1|(461,321)|
+11,10,48,492,321,6,8,34,3,0,0,1,0,0,0
+10,11,Attrition,492,337,26,8,40,3,0,0,-1,0,0,0
+10,12,Required Labor,505,250,47,8,8,3,0,0,0,0,0,0
+10,13,Adjustment for Labor,314,245,45,13,8,131,0,0,0,0,0,0
+1,14,12,30,1,0,0,0,0,64,0,-1--1--1,,1|(453,192)|
+1,15,13,5,1,0,0,0,0,64,0,-1--1--1,,1|(299,268)|
+1,16,6,11,1,0,0,0,0,64,0,-1--1--1,,1|(372,353)|
+10,17,Average Duration of Employment,565,385,53,14,8,3,0,0,0,0,0,0
+1,18,17,11,1,0,0,0,0,64,0,-1--1--1,,1|(545,351)|
+1,19,11,6,1,0,0,0,0,64,0,-1--1--1,,1|(416,385)|
+1,20,1,13,1,0,0,0,0,64,0,-1--1--1,,1|(387,257)|
+10,21,Labor Adjustment Time,203,221,52,14,8,3,0,0,0,0,0,0
+1,22,21,13,1,0,0,0,0,64,0,-1--1--1,,1|(242,244)|
+10,23,Initial Labor,216,112,36,8,8,3,0,0,-1,0,0,0
+1,24,23,1,0,0,0,0,0,64,1,-1--1--1,,1|(295,204)|
+10,25,Initial Capabilities,547,84,40,14,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,26,Required Output,547,84,57,8,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+10,27,Standard Workweek,547,84,35,14,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|12||128-128-128
+1,28,23,11,0,1,0,0,0,64,0,-1--1--1,,1|(348,220)|
+10,29,Authorized Labor,318,145,52,8,8,3,0,0,0,0,0,0
+10,30,Target Labor,394,186,38,8,8,3,0,0,0,0,0,0
+1,31,29,30,1,0,0,0,0,64,0,-1--1--1,,1|(359,166)|
+1,32,30,13,1,0,0,0,0,64,0,-1--1--1,,1|(357,197)|
+1,33,23,29,1,0,0,0,0,64,0,-1--1--1,,1|(259,118)|
+1,34,1,12,1,0,0,0,0,64,0,-1--1--1,,1|(479,290)|
+10,35,Output Shortfall,562,182,32,14,8,2,0,3,-1,0,0,0,128-128-128,0-0-0,|12|B|128-128-128
+10,36,Sensitivity of Labor to Output Shortfall,621,222,59,14,8,3,0,0,0,0,0,0
+1,37,35,12,1,0,0,0,0,64,0,-1--1--1,,1|(536,206)|
+1,38,36,12,1,0,0,0,0,64,0,-1--1--1,,1|(555,252)|
+10,39,Fractional Change in Labor,254,77,50,14,8,3,0,0,0,0,0,0
+10,40,Time to Change Labor,374,97,43,14,8,3,0,0,0,0,0,0
+1,41,39,29,1,0,0,0,0,64,0,-1--1--1,,1|(280,93)|
+1,42,40,29,1,0,0,0,0,64,0,-1--1--1,,1|(355,117)|
+10,43,Ramp in Labor,188,151,44,8,8,3,0,0,0,0,0,0
+1,44,43,29,0,0,0,0,0,64,0,-1--1--1,,1|(242,148)|
+10,45,Sensitivity of Labor to Capabilities,642,285,61,19,8,131,0,0,0,0,0,0
+1,46,45,12,1,0,0,0,0,64,0,-1--1--1,,1|(554,277)|
+12,47,0,359,27,45,9,8,135,0,60,-1,0,2,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 1
+12,48,0,613,27,37,9,8,135,0,60,-1,0,5,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Workforce
+12,49,0,269,27,43,9,8,135,0,60,-1,0,1,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Introduction
+12,50,0,536,27,37,9,8,135,0,60,-1,0,4,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Full Model
+12,51,0,452,27,45,9,8,135,0,60,-1,0,3,0,-1--1--1,255-160-0,Arial|14|B|0-0-0
+Dashboard 2
+///---\\\
+:GRAPH Output
+:TITLE Output
+:X-AXIS time
+:SCALE
+:VAR Output
+:LINE-WIDTH 3
+:VAR Required Output
+:LINE-WIDTH 3
+
+:GRAPH Shortfall
+:TITLE Shortfall
+:SCALE
+:VAR Output Shortfall|Shortfall
+:Y-MIN -1
+:Y-MAX 1
+:LINE-WIDTH 3
+
+:GRAPH Capabilities
+:TITLE Capabilities
+:SCALE
+:VAR Capabilities
+:Y-MIN 0
+:LINE-WIDTH 3
+
+:GRAPH Effort_Allocation
+:TITLE Effort Allocation
+:STACK-FILL 0
+:SCALE
+:VAR Fraction of Time Spent Working
+:Y-MIN 0
+:Y-MAX 1
+:LINE-WIDTH 3
+:VAR Fraction of Time Spent Improving
+:LINE-WIDTH 3
+
+:GRAPH Work_Week
+:TITLE Work Week
+:STACK-FILL 0
+:SCALE
+:VAR Time Spent Working
+:Y-MIN 0
+:Y-MAX 80
+:LINE-WIDTH 4
+:VAR Time Spent Improving
+:LINE-WIDTH 4
+
+:GRAPH Capability_Improvement_and_Loss
+:TITLE Capability Improvement and Loss
+:SCALE
+:VAR Capability Increase
+:LINE-WIDTH 3
+:VAR Capability Decrease
+:LINE-WIDTH 3
+
+:GRAPH Labor_Force
+:TITLE Labor Force
+:SCALE
+:VAR Authorized Labor
+:Y-MIN 0
+:LINE-WIDTH 3
+:VAR Labor
+:LINE-WIDTH 3
+:L<%^E!@
+1:Current.vdf
+1:/Users/houghton/Google Drive/MIT PhD/Classes/15.879 - SD seminar/Current.vdf
+9:Current
+22:$,Dollar,Dollars,$s
+22:Hour,Hours
+22:Month,Months
+22:Person,People,Persons
+22:Unit,Units
+22:Week,Weeks
+22:Year,Years
+22:Day,Days
+23:0
+15:0,0,0,0,0,0
+19:100,3
+27:2,
+34:0,
+4:Time
+5:Output Shortfall
+35:Date
+36:YYYY-MM-DD
+37:2000
+38:1
+39:1
+40:0
+41:0
+42:0
+24:-1
+25:5
+26:5

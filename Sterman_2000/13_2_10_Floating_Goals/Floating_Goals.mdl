@@ -1,0 +1,139 @@
+{UTF-8}
+Desired State of the System= INTEG (
+	Net Change in Goal,
+		Initial Goal)
+	~	
+	~		|
+
+Goal Adjustment Time=
+	1
+	~	
+	~		|
+
+Initial Goal=
+	0
+	~	
+	~		|
+
+Initial State of the System=
+	0
+	~	
+	~		|
+
+Net Change in Goal=
+	(State of the System-Desired State of the System)/Goal Adjustment Time
+	~	
+	~		|
+
+Net Change in State=
+	(Desired State of the System-State of the System)/State Adjustment Time
+	~	
+	~		|
+
+State Adjustment Time=
+	1
+	~	 [0,?]
+	~		|
+
+State of the System= INTEG (
+	Net Change in State,
+		Initial State of the System)
+	~	
+	~		|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 10
+	~	Month
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	Month
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP 
+	~	Month [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 0.03125
+	~	Month [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$192-192-192,0,Times New Roman|12||0-0-0|0-0-0|0-0-255|-1--1--1|-1--1--1|72,72,100,0
+10,1,State of the System,506,533,40,20,3,3,0,0,0,0,0,0
+10,2,Desired State of the System,699,424,40,20,3,3,0,0,0,0,0,0
+12,3,48,505,393,10,8,0,3,0,0,-1,0,0,0
+1,4,6,1,4,0,0,22,0,0,0,-1--1--1,,1|(504,474)|
+1,5,6,3,100,0,0,22,0,0,0,-1--1--1,,1|(504,412)|
+11,6,48,504,429,8,6,33,3,0,0,2,0,0,0
+10,7,Net Change in State,446,429,50,8,40,3,0,0,-1,0,0,0
+12,8,48,701,567,10,8,0,3,0,0,-1,0,0,0
+1,9,11,2,4,0,0,22,0,0,0,-1--1--1,,1|(702,484)|
+1,10,11,8,100,0,0,22,0,0,0,-1--1--1,,1|(702,548)|
+11,11,48,702,531,8,6,33,3,0,0,4,0,0,0
+10,12,Net Change in Goal,760,531,50,8,40,3,0,0,-1,0,0,0
+1,13,2,6,1,0,43,0,2,64,0,-1--1--1,|0||-1--1--1,1|(605,384)|
+1,14,1,11,1,0,43,0,2,64,0,-1--1--1,|0||-1--1--1,1|(595,575)|
+1,15,2,12,1,0,45,0,2,64,0,-1--1--1,|0||-1--1--1,1|(822,453)|
+1,16,1,7,1,0,45,0,2,64,0,-1--1--1,|0||-1--1--1,1|(376,485)|
+12,17,0,606,470,20,20,5,7,0,3,-1,0,0,0,255-0-0,0-0-0,|0||255-0-0
+R
+12,18,0,607,502,51,8,8,7,0,2,-1,0,0,0,-1--1--1,0-0-0,|0||255-0-0
+Floating Goal Spiral
+12,19,0,428,488,20,20,4,7,0,3,-1,0,0,0,255-0-0,0-0-0,|0||255-0-0
+B
+12,20,0,428,524,36,13,8,135,0,2,-1,0,0,0,-1--1--1,0-0-0,|0||255-0-0
+State Adjustment
+12,21,0,772,448,20,20,4,7,0,3,-1,0,0,0,255-0-0,0-0-0,|0||255-0-0
+B
+12,22,0,772,485,33,15,8,135,0,2,-1,0,0,0,-1--1--1,0-0-0,|0||255-0-0
+Goal Adjustment
+10,23,State Adjustment Time,411,385,57,8,8,3,0,0,0,0,0,0
+10,24,Goal Adjustment Time,795,571,57,8,8,3,0,0,0,0,0,0
+1,25,23,7,0,0,0,0,0,128,0,-1--1--1,,1|(423,401)|
+1,26,24,12,0,0,0,0,0,128,0,-1--1--1,,1|(782,556)|
+10,27,Initial State of the System,509,584,46,14,8,3,0,0,0,0,0,0
+10,28,Initial Goal,696,379,30,8,8,3,0,0,0,0,0,0
+1,29,28,2,0,0,0,0,0,64,1,-1--1--1,,1|(696,388)|
+1,30,27,1,0,0,0,0,0,64,1,-1--1--1,,1|(508,568)|
+///---\\\
+:L<%^E!@
+1:Current.vdf
+9:Current
+22:$,Dollar,Dollars,$s
+22:Day,Days
+22:Hour,Hours
+22:Month,Months
+22:Person,People,Persons
+22:Unit,Units
+22:Week,Weeks
+22:Year,Years
+15:0,0,0,0,0,0
+19:100,0
+27:2,
+34:0,
+4:Time
+5:Initial Goal
+35:Date
+36:YYYY-MM-DD
+37:2000
+38:1
+39:1
+40:2
+41:0
+42:0
+24:0
+25:10
+26:10
